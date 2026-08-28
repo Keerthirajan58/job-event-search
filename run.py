@@ -152,8 +152,10 @@ def main(argv=None):
     # ---- persist
     new_uids, changed = store.upsert(con, events + gated)
 
-    # Refuse to emit a dashboard built from a crippled collection run.
-    if len(events) < config.MIN_EVENTS_SANITY:
+    # Refuse to emit a dashboard built from a crippled collection run. Only applies
+    # to a normal full-window run - a deliberate short --days window legitimately
+    # returns fewer events and must not be treated as a failure.
+    if args.days is None and len(events) < config.MIN_EVENTS_SANITY:
         log("\n  ABORT: only %d unique in-window events (expected >=%d). A source is "
             "probably blocked or down; refusing to overwrite a good dashboard with a "
             "thin one. Re-run with --no-cache, or lower MIN_EVENTS_SANITY if the "
