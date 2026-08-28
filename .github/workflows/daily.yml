@@ -1,0 +1,112 @@
+# Daily job-event digest -> GitHub Pages.
+#
+# Cost: ~8 of the 2000 free Actions minutes per month. Nothing here is paid.
+#
+# Design notes, because three obvious approaches do not work:
+#
+#  1. State is restored with actions/cache, NOT committed. data/events.db is a
+#     regenerable 5 MB binary; committing it daily would add ~50 MB of pack per
+#     two months. The cache only powers "NEW"/"changed" flags, so losing it is
+#     harmless - everything simply reads as new once.
+#  2. data/attendance.db IS committed (12 KB) and is checked out normally. It holds
+#     your logged outcomes, which are irreplaceable and which the organiser prior
+#     needs in order to affect the published dashboard.
+#  3. The `secrets` context is not available in step-level `if:`. The optional
+#     notification step therefore maps the secret to env and tests the env var.
+name: daily-digest
+
+on:
+  schedule:
+    # 13:00 UTC = 06:00 PDT. Becomes 05:00 PST after 1 Nov; change to "0 14 * * *"
+    # if you want a steady 06:00 local time year round.
+    - cron: "0 13 * * *"
+  workflow_dispatch:          # run it by hand from the Actions tab
+  push:
+    branches: [main]          # first deploy happens as soon as you push
+    paths-ignore: ["**.md"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let a scheduled run and a manual run deploy over each other.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      TZ: America/Los_Angeles
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Rotating key: the cache is immutable once written, so a run-scoped key
+      # plus a prefix restore-key gives us "load newest, save fresh".
+      - name: Restore event history
+        uses: actions/cache@v4
+        with:
+          path: data
+          key: jobevents-data-${{ github.run_id }}
+          restore-keys: |
+            jobevents-data-
+
+      - name: Generate digest
+        run: python3 run.py
+
+      - name: Check the artifact is real
+        run: |
+          test -s out/index.html || { echo "::error::index.html missing or empty"; exit 1; }
+          test -s out/digest.json || { echo "::error::digest.json missing"; exit 1; }
+          grep -q 'noindex' out/index.html || { echo "::error::noindex meta missing"; exit 1; }
+          python3 -c "import json;d=json.load(open('out/digest.json'));print('events:',d['meta']['unique_events'],'recommended:',d['meta']['recommended'])"
+
+      - name: Summary
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          d = json.load(open("out/digest.json"))
+          m = d["meta"]
+          print("## Digest for %s .. %s\n" % (m["window_start"], m["window_end"]))
+          print("| | |\n|---|---|")
+          for k in ("raw_listings","unique_events","recommended","gated","changed",
+                    "with_openings","runtime_s"):
+              print("| %s | %s |" % (k.replace("_"," "), m.get(k)))
+          print("\n### Highest scoring\n")
+          rec = [e for v in d["days"].values() for e in v["recommended"]]
+          for e in sorted(rec, key=lambda x: -x["score"])[:10]:
+              print("- **%d/100 %s** %s - [%s](%s)"
+                    % (e["score"], e.get("verdict",""), e["date"], e["title"], e["url"]))
+          PY
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+      - name: Optional Telegram push
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
+        run: |
+          if [ -n "$TELEGRAM_TOKEN" ] && [ -n "$TELEGRAM_CHAT" ]; then
+            python3 -m jobevents.notify
+          else
+            echo "No Telegram secrets set - skipping (this is fine)."
+          fi
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

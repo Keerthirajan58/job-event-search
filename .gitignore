@@ -1,0 +1,12 @@
+# Regenerable HTTP response cache (11 MB) and event catalogue (5 MB).
+# CI restores data/ from actions/cache; locally they just rebuild.
+data/cache/
+data/events.db
+
+# Generated dashboard - published by Actions, no need to version it.
+out/
+
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
