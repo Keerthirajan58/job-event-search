@@ -328,12 +328,22 @@ def write_html(path, days, new_uids, meta, today):
             out.append(_event_card(ev, ev.uid in new_uids, rank=i))
         out.append('</div>')
 
+    # ---------- TOP OF THE WINDOW (full detail, any date)
+    everything = [e for k in keys for e in pick(days[k])]
+    beyond_week = [e for e in everything if e.date_key not in set(keys[:8])]
+    beyond_week.sort(key=lambda e: -e.score)
+    if beyond_week:
+        out.append("<h2>Highest value further out &mdash; register now</h2>")
+        out.append('<p class="sub" style="margin-top:-6px">These are past the next '
+                   'seven days, so they are easy to forget &mdash; and the good ones '
+                   'sell out or close registration first.</p>')
+        for i, ev in enumerate(beyond_week[:6], 1):
+            out.append(_event_card(ev, ev.uid in new_uids, rank=i))
+
     # ---------- REST OF WINDOW
-    out.append("<h2>Rest of the window &mdash; register ahead</h2>")
-    later = []
-    for k in keys[8:]:
-        later.extend(pick(days[k], max_n=2))
-    later.sort(key=lambda e: -e.score)
+    out.append("<h2>Everything else in the window</h2>")
+    shown = {id(e) for e in beyond_week[:6]}
+    later = [e for e in beyond_week if id(e) not in shown]
     if later:
         out.append('<table class="scan">')
         for ev in later[:25]:

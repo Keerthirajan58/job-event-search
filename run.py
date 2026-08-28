@@ -39,7 +39,8 @@ def main(argv=None):
     ap.add_argument("--no-cache", action="store_true")
     ap.add_argument("--explain", metavar="SUBSTR")
     ap.add_argument("--audit", action="store_true")
-    ap.add_argument("--days", type=int, default=config.WINDOW_DAYS)
+    ap.add_argument("--days", type=int, default=None,
+                    help="window length; default runs to config.WINDOW_END")
     ap.add_argument("--start", metavar="YYYY-MM-DD")
     ap.add_argument("--no-openings", action="store_true",
                     help="skip public job-board lookups (faster, fewer requests)")
@@ -52,10 +53,14 @@ def main(argv=None):
     now = local_now()
     win_start = (dt.date.fromisoformat(args.start) if args.start
                  else max(config.WINDOW_START, now.date()))
-    win_end = win_start + dt.timedelta(days=args.days - 1)
+    if args.days is not None:
+        win_end = win_start + dt.timedelta(days=args.days - 1)
+    else:
+        win_end = max(config.WINDOW_END, win_start)
+    days = (win_end - win_start).days + 1
 
     log("=" * 74)
-    log("  COLLECT   window %s .. %s   (%d days)" % (win_start, win_end, args.days))
+    log("  COLLECT   window %s .. %s   (%d days)" % (win_start, win_end, days))
     log("=" * 74)
 
     raw = []
@@ -154,8 +159,8 @@ def main(argv=None):
             "thin one. Re-run with --no-cache, or lower MIN_EVENTS_SANITY if the "
             "window is genuinely short." % (len(events), config.MIN_EVENTS_SANITY))
         return 2
-    days = report.by_day(events, win_start, args.days)
-    rec_total = sum(len(report.pick(v)) for v in days.values())
+    by_date = report.by_day(events, win_start, days)
+    rec_total = sum(len(report.pick(v)) for v in by_date.values())
     store.record_run(con, len(raw), len(events), rec_total, len(gated), http.stats())
 
     # ---- modes
@@ -168,7 +173,7 @@ def main(argv=None):
 
     # ---- output
     log("\n")
-    report.terminal_digest(days, new_uids, now.date(), out=log)
+    report.terminal_digest(by_date, new_uids, now.date(), out=log)
     if changed:
         log("\n  %d listings changed since the last run (venue/time/price/details):"
             % len(changed))
@@ -184,14 +189,14 @@ def main(argv=None):
             "changed": len(changed),
             "with_openings": sum(1 for e in events if e.openings),
             "http": http.stats(), "runtime_s": round(time.time() - t0, 1)}
-    jp = report.write_json(config.OUT_DIR + "/digest.json", days, new_uids, meta)
+    jp = report.write_json(config.OUT_DIR + "/digest.json", by_date, new_uids, meta)
 
     from jobevents.html_report import write_html
-    hp = write_html(config.OUT_DIR + "/index.html", days, new_uids, meta, now.date())
+    hp = write_html(config.OUT_DIR + "/index.html", by_date, new_uids, meta, now.date())
 
     log("\n" + "=" * 74)
     log("  %d raw -> %d unique -> %d recommended across %d days   (%.0fs, %d HTTP, %d cached)"
-        % (len(raw), len(events), rec_total, args.days, time.time() - t0,
+        % (len(raw), len(events), rec_total, days, time.time() - t0,
            http.stats()["fetched"], http.stats()["cached"]))
     log("  JSON: %s" % jp)
     log("  HTML: %s      <- open this" % hp)

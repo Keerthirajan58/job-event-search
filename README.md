@@ -110,6 +110,55 @@ Everything you'd want to change is in two files:
 
 Your profile and the conversation openers live in `jobevents/advice.py`.
 
+## Deploying it (daily digest on your phone, $0)
+
+```bash
+gh auth login       # opens a browser; the only manual step
+./deploy.sh         # creates the repo, enables Pages, pushes, waits, verifies
+```
+
+`deploy.sh` is idempotent — re-run it any time. It prints the live URL at the end:
+
+```
+https://<your-github-username>.github.io/job-event-search/
+```
+
+After that the dashboard rebuilds **daily at 06:00 America/Los_Angeles** via GitHub
+Actions (~8 of the 2000 free minutes per month). Force a refresh any time with:
+
+```bash
+gh workflow run daily-digest --repo <you>/job-event-search
+```
+
+### Two things to know about the deployment
+
+**The repo must be public.** GitHub Pages on a free account only works from a public
+repo; private + Pages requires GitHub Pro. So the code and the dashboard URL are both
+world-readable. The page carries `noindex, nofollow, noarchive` plus a `robots.txt`
+disallow, so it stays out of search results, but anyone with the link can read it.
+For that reason `config.py` holds a neighbourhood centroid, not your street address,
+and no email address.
+
+**State is split deliberately.**
+
+| file | in git? | why |
+|---|---|---|
+| `data/attendance.db` | **yes** (12 KB) | your logged outcomes — irreplaceable, and the deployed dashboard needs them for the organiser prior |
+| `data/events.db` | no (5 MB) | regenerable event catalogue; CI restores it from `actions/cache`. Losing it only means everything reads as "new" once |
+| `data/cache/` | no (11 MB) | HTTP response cache |
+| `out/` | no | published by Actions, no reason to version it |
+
+So after you log an event locally, commit `data/attendance.db` and push — that is what
+carries your feedback into the daily build.
+
+### If a run fails
+
+The workflow refuses to publish a thin dashboard: if fewer than
+`MIN_EVENTS_SANITY` (120) unique in-window events survive collection, `run.py` exits
+non-zero and the deploy step is skipped, leaving yesterday's good dashboard up. That is
+the expected behaviour if a source starts blocking datacenter IPs — check the Actions
+log to see which source returned nothing.
+
 ## Where the data comes from
 
 Luma (public JSON API), Meetup (public search pages), HackerX (JSON-LD),

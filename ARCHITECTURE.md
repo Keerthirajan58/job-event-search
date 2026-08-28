@@ -362,6 +362,42 @@ sample size, and always prints as a line in the breakdown. `--stats` also report
 whether events scored ≥70 actually produced better nights than those below — if they
 did not, the weights are wrong and your data should win.
 
+## 5c. Deployment (phase 7)
+
+`./deploy.sh` after `gh auth login`. It creates a public repo, sets Pages to build
+from Actions, pushes, watches the run, then verifies the live page.
+
+Four things about CI that needed handling, each found by testing rather than assumed:
+
+**Pages requires a public repo on the free plan.** Private + Pages needs GitHub Pro,
+which breaks the $0 rule. Consequence: the personal email came out of the User-Agent
+and `HOME_LAT/LON` became an Ocean View neighbourhood centroid instead of a street
+address (worth about a minute of travel-estimate accuracy). The page carries
+`noindex, nofollow, noarchive` and a `robots.txt` disallow.
+
+**State had to be split.** `data/events.db` is 5 MB and regenerable — committing it
+daily would add ~50 MB of pack per two months, so CI restores it from `actions/cache`
+with a rotating key. But the organiser prior lives in the same database and *is*
+irreplaceable, so attendance moved to `data/attendance.db` (12 KB), which is committed.
+Without that split the deployed dashboard could never reflect logged outcomes.
+
+**`secrets` is not available in a step-level `if:`.** The original workflow's
+`if: ${{ secrets.TELEGRAM_TOKEN != '' }}` would not have worked. The optional
+notification step now maps the secret to `env` and tests the variable in shell.
+
+**Pages must be configured before the first push.** The workflow triggers on push; a
+run that builds before Pages is set to "GitHub Actions" fails at the deploy step. The
+script therefore enables Pages first, with a retry after the push for the case where
+a brand-new empty repo rejects the API call.
+
+Two correctness fixes came out of thinking about a job that runs every day rather than
+once: the window now ends on a **fixed date** (`WINDOW_END = 2026-10-31`) because a
+rolling start with a fixed day-count would have been looking into December by late
+October; and the dashboard now renders **full cards for the highest-value events
+anywhere in the window**, not just the next seven days — previously WorkOS Demo Night
+on Sept 14 and the Codex meetup on Sept 24 appeared only as one-line table rows, so
+their cost, companies, openings and opener were invisible until the date came close.
+
 ## 6. Failure modes
 
 | Failure | Likelihood | Blast radius | Mitigation in place |
@@ -403,8 +439,7 @@ per-event fit/who-to-meet/opener · SQLite history with `NEW` detection · `dige
 - [x] **Phase 4** — company detection with roles, and verified live openings *(done)*
 - [x] **Phase 5** — feedback loop and learned organiser prior *(done)*
 - [x] **Phase 6** — verdict badges, change detection, extended window to Oct 31 *(done)*
-- [ ] **Phase 7** — daily automation: GitHub Actions cron + Pages *(config included;
-      needs the repo pushed to GitHub)*
+- [x] **Phase 7** — daily automation: GitHub Actions cron + Pages *(done; `./deploy.sh`)*
 - [ ] **Phase 8** — optional push: Telegram webhook, opt-in via env var *(code included)*
 
 The feedback loop is now in place but has no data. It becomes the most valuable part of

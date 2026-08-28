@@ -4,7 +4,10 @@ import datetime as dt
 # ---------------------------------------------------------------- time window
 # Inclusive local-date window the tool reports on.
 WINDOW_START = dt.date(2026, 9, 1)
-WINDOW_DAYS = 61          # through 2026-10-31, so SF Tech Week (Oct 5-11) is covered
+# Hard end date rather than a day count: this runs daily, and a rolling start with
+# a fixed length would have it looking into December by late October.
+WINDOW_END = dt.date(2026, 10, 31)
+WINDOW_DAYS = (WINDOW_END - WINDOW_START).days + 1
 LOCAL_TZ = "America/Los_Angeles"
 
 # ---------------------------------------------------------------- geography
