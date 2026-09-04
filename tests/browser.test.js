@@ -52,7 +52,10 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await p.setViewport({width: 1200, height: 950});
   const errors = [];
   p.on('pageerror', e => errors.push('pageerror: ' + e.message));
-  p.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
+  p.on('console', m => {
+    // The browser probes /favicon.ico by itself; that 404 is not a page fault.
+    if (m.type() === 'error' && !/favicon/.test(m.text())) errors.push('console: ' + m.text());
+  });
   await p.goto('file://' + page, {waitUntil: 'networkidle0'});
 
   console.log('\nnothing is covering the page');

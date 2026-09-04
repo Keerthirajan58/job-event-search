@@ -59,8 +59,14 @@ group('page structure');
   const p = open_();
   ok(p.$('meta[name="robots"]').content.includes('noindex'), 'page is noindexed');
   ok(p.$$('.tab').length === 6, 'six tabs', p.$$('.tab').length);
-  ok(p.$$('script').length === 1 && p.$$('link').length === 0,
-     'no external scripts or stylesheets');
+  // The real property is "loads nothing over the network", not "has no <link>".
+  // A data: URI favicon is fine; an off-origin URL is not.
+  const ext = [...p.$$('script[src]'), ...p.$$('link[href]'), ...p.$$('img[src]')]
+    .map(e => e.getAttribute('src') || e.getAttribute('href'))
+    .filter(u => /^(https?:)?\/\//.test(u));
+  ok(ext.length === 0, 'loads no off-origin resources', ext.join(',') || 'none');
+  ok(p.$$('script').length === 1 && p.$$('script[src]').length === 0,
+     'exactly one inline script, no external ones');
   ok(p.cards().length > 0, 'event cards rendered', p.cards().length);
   ok(p.$$('.ev[data-compact]').length > 0 &&
      p.cards().every(c => !c.hasAttribute('data-compact')),

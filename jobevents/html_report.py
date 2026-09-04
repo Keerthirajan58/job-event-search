@@ -10,6 +10,8 @@ from .companies import display as _cdisp
 from .report import CAT_COLOR, CONF_COLOR, pick
 from .score import CATEGORIES
 
+ICON = ('<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'%3E%3Crect width=\'32\' height=\'32\' rx=\'7\' fill=\'%231462b5\'/%3E%3Ctext x=\'16\' y=\'23\' font-size=\'19\' font-family=\'system-ui,sans-serif\' font-weight=\'700\' fill=\'white\' text-anchor=\'middle\'%3ESF%3C/text%3E%3C/svg%3E">')
+
 CSS = """
 /* MUST come first and MUST stay !important.
    The HTML `hidden` attribute is only honoured by the user-agent rule
@@ -904,6 +906,7 @@ def write_html(path, days, new_uids, meta, today, seed=None):
            # it. Keep it out of search results: this page states that its owner is
            # job-hunting and roughly where they commute from.
            '<meta name="robots" content="noindex, nofollow, noarchive">',
+           '%s' % ICON,
            '<title>Job-Event Search &mdash; SF</title><style>%s</style></head>' % CSS,
            # data/triage.json travels through git, so marks made on the laptop
            # reach the phone. The client merges it into localStorage by recency.
