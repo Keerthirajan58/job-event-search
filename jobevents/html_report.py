@@ -1,6 +1,7 @@
 """Single self-contained HTML dashboard. No build step, no CDN, no JS deps."""
 import datetime as dt
 import html as H
+import json
 import os
 
 from . import config
@@ -97,6 +98,95 @@ padding:9px 12px;border-radius:0 7px 7px 0;font-size:13px;margin:10px 0 0}
 .chg{font-size:12px;color:var(--warn);font-weight:600;margin-top:7px}
 .fup{font-size:13px;color:var(--dim);margin-top:6px;padding-left:12px;
 border-left:2px solid var(--line)}
+
+/* ---------------------------------------------------- tabs */
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:20px 0 4px;
+position:sticky;top:0;z-index:20;background:var(--bg);padding:8px 0;
+border-bottom:1px solid var(--line)}
+.tab{appearance:none;border:1px solid var(--line);background:var(--card);
+color:var(--fg);font:inherit;font-size:13px;font-weight:600;padding:7px 13px;
+border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.tab:hover{border-color:var(--accent)}
+.tab[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tab .cnt{font-size:11px;font-weight:700;padding:1px 6px;border-radius:10px;
+background:rgba(0,0,0,.14)}
+.tab[aria-selected="true"] .cnt{background:rgba(255,255,255,.25)}
+.tab .cnt.zero{opacity:.45}
+.panel[hidden]{display:none!important}
+
+/* ---------------------------------------------------- triage controls */
+.triage{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0;
+padding-top:10px;border-top:1px dashed var(--line)}
+.tbtn{appearance:none;border:1px solid var(--line);background:transparent;
+color:var(--fg);font:inherit;font-size:12.5px;font-weight:600;padding:6px 12px;
+border-radius:6px;cursor:pointer;transition:background .12s,border-color .12s}
+.tbtn:hover{border-color:var(--accent);background:rgba(20,98,181,.07)}
+.tbtn[aria-pressed="true"]{color:#fff;border-color:transparent}
+.tbtn.go[aria-pressed="true"]{background:var(--good)}
+.tbtn.save[aria-pressed="true"]{background:var(--accent)}
+.tbtn.hide[aria-pressed="true"]{background:var(--dim)}
+.state{font-size:12px;color:var(--dim);align-self:center;margin-left:auto}
+.ev.is-going{border-left:3px solid var(--good)}
+.ev.is-saved{border-left:3px solid var(--accent)}
+.ev.is-hidden{opacity:.55}
+
+/* ---------------------------------------------------- calendar */
+.calwrap{margin:14px 0 0}
+.cal{margin-bottom:22px}
+.cal h3{font-size:15px;margin:0 0 8px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dow{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
+color:var(--dim);text-align:center;padding:4px 0;font-weight:700}
+.cell{aspect-ratio:1/1;border:1px solid var(--line);border-radius:7px;
+background:var(--card);padding:5px 4px 4px;display:flex;flex-direction:column;
+align-items:center;justify-content:flex-start;cursor:pointer;position:relative;
+font-size:13px;min-height:46px}
+.cell.out{opacity:.28;cursor:default;background:transparent;border-color:transparent}
+.cell.none{cursor:default;color:var(--dim)}
+.cell:not(.out):not(.none):hover{border-color:var(--accent)}
+.cell.sel{outline:2px solid var(--accent);outline-offset:-2px}
+.cell.today .dnum{background:var(--fg);color:var(--bg);border-radius:50%;
+width:20px;height:20px;display:flex;align-items:center;justify-content:center}
+.cell .dnum{font-weight:650;line-height:20px;height:20px}
+.cell .dots{display:flex;gap:2px;margin-top:3px;flex-wrap:wrap;
+justify-content:center;max-width:100%}
+.cell .dot{width:5px;height:5px;border-radius:50%;background:var(--dim)}
+.cell .dot.go{background:var(--good)}.cell .dot.worth{background:var(--accent)}
+.cell .dot.maybe{background:var(--warn)}
+.cell .going{position:absolute;top:2px;right:3px;font-size:9px;color:var(--good);
+font-weight:800}
+.callegend{font-size:11.5px;color:var(--dim);display:flex;gap:14px;flex-wrap:wrap;
+margin:2px 0 16px}
+.callegend span{display:inline-flex;align-items:center;gap:5px}
+.callegend i{width:6px;height:6px;border-radius:50%;display:inline-block}
+
+/* ---------------------------------------------------- misc chrome */
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0 6px}
+.abtn{appearance:none;border:1px solid var(--line);background:var(--card);
+color:var(--fg);font:inherit;font-size:12.5px;font-weight:600;padding:7px 12px;
+border-radius:6px;cursor:pointer;text-decoration:none;display:inline-block}
+.abtn:hover{border-color:var(--accent)}
+.abtn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(80px);
+background:var(--fg);color:var(--bg);padding:11px 16px;border-radius:8px;
+font-size:13px;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.25);z-index:100;
+display:flex;align-items:center;gap:14px;transition:transform .2s;max-width:92vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast button{appearance:none;background:transparent;border:1px solid currentColor;
+color:inherit;font:inherit;font-size:12px;font-weight:700;padding:3px 10px;
+border-radius:5px;cursor:pointer}
+.ghost{border:1px dashed var(--line);border-radius:9px;padding:14px 16px;
+color:var(--dim);font-size:13px;margin:10px 0}
+.ghost b{color:var(--fg)}
+.orphan{border:1px solid var(--line);border-left:3px solid var(--warn);
+border-radius:9px;padding:12px 14px;margin:0 0 10px;background:var(--card)}
+.orphan .t{font-weight:650;font-size:14.5px}
+.orphan .m{font-size:12.5px;color:var(--dim);margin-top:3px}
+.sync{margin-top:10px}
+.sync textarea{width:100%;min-height:74px;font-family:ui-monospace,SFMono-Regular,
+Menlo,monospace;font-size:11px;border:1px solid var(--line);border-radius:7px;
+padding:9px;background:var(--card);color:var(--fg);resize:vertical}
+.daynote{font-size:12px;color:var(--dim);margin:2px 0 8px}
 """
 
 
@@ -125,7 +215,19 @@ def _event_card(ev, is_new, rank=0, compact=False):
     cat_label = CATEGORIES[ev.category][0]
     cls = "ev top" if (rank == 1 and not compact) else ("ev skip" if compact else "ev")
     v = ev.verdict or "SKIP"
-    p = ['<div class="%s">' % cls]
+
+    # Data attributes are the contract with the client-side layer: it filters,
+    # counts, builds the calendar and writes .ics entirely from these, so there is
+    # no second copy of the event data to keep in sync.
+    dur = (ev.cost or {}).get("event_minutes") or 120
+    p = ['<div class="%s" data-uid="%s" data-date="%s" data-start="%s" data-dur="%d" '
+         'data-score="%d" data-verdict="%s" data-age="%s" data-changed="%d" '
+         'data-title="%s" data-venue="%s" data-url="%s" data-time="%s">'
+         % (cls, _e(ev.uid), _e(ev.date_key),
+            _e(ev.start.strftime("%Y%m%dT%H%M%S") if ev.start else ""), dur,
+            ev.score, _e(v), "" if ev.age_days is None else ev.age_days,
+            1 if ev.changed_note else 0,
+            _e(ev.title), _e(ev.venue or ""), _e(ev.url), _e(ev.time_str or ""))]
 
     # ---- header: verdict, title, score
     p.append('<div class="evhead"><div style="flex:1 1 auto">')
@@ -157,6 +259,16 @@ def _event_card(ev, is_new, rank=0, compact=False):
 
     if ev.changed_note:
         p.append('<p class="chg">Changed since your last run: %s</p>' % _e(ev.changed_note))
+
+    if not compact:
+        p.append('<div class="triage">'
+                 '<button class="tbtn go" data-act="going" aria-pressed="false">'
+                 'I am going</button>'
+                 '<button class="tbtn save" data-act="saved" aria-pressed="false">'
+                 'Save for later</button>'
+                 '<button class="tbtn hide" data-act="hidden" aria-pressed="false">'
+                 'Not interested</button>'
+                 '<span class="state"></span></div>')
 
     if compact:
         p.append('<div class="blk"><div class="h">Why it scored low</div><ul><li>%s</li></ul>'
@@ -261,7 +373,390 @@ def _event_card(ev, is_new, rank=0, compact=False):
     return "".join(p)
 
 
-def write_html(path, days, new_uids, meta, today):
+def _month_grids(keys, today):
+    """Server-rendered month grids for the window. JS annotates them from the card
+    pool, so the calendar can never disagree with the list."""
+    if not keys:
+        return ""
+    first = dt.date.fromisoformat(keys[0])
+    last = dt.date.fromisoformat(keys[-1])
+    in_window = set(keys)
+    out = ['<div class="calwrap">']
+    out.append('<div class="callegend">'
+               '<span><i style="background:var(--good)"></i>GO</span>'
+               '<span><i style="background:var(--accent)"></i>worth it</span>'
+               '<span><i style="background:var(--warn)"></i>maybe</span>'
+               '<span><b style="color:var(--good)">&#9679;</b>&nbsp;you are going</span>'
+               '<span>Tap a date to see that day only.</span>'
+               '</div>')
+    cur = dt.date(first.year, first.month, 1)
+    while cur <= last:
+        out.append('<div class="cal"><h3>%s</h3><div class="grid">' % cur.strftime("%B %Y"))
+        for d in ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"):
+            out.append('<div class="dow">%s</div>' % d)
+        # Monday-first offset
+        lead = cur.weekday()
+        for _ in range(lead):
+            out.append('<div class="cell out"></div>')
+        day = cur
+        while day.month == cur.month:
+            iso = day.isoformat()
+            cls = "cell"
+            if iso not in in_window:
+                cls += " out"
+            if day == today:
+                cls += " today"
+            out.append('<div class="%s" data-cell="%s"><span class="dnum">%d</span>'
+                       '<span class="dots"></span></div>' % (cls, iso, day.day))
+            day += dt.timedelta(days=1)
+        out.append('</div></div>')
+        cur = (cur.replace(day=28) + dt.timedelta(days=4)).replace(day=1)
+    out.append('</div>')
+    return "".join(out)
+
+
+JS = r"""
+(function(){
+'use strict';
+// Triage state lives in localStorage. The page is static on GitHub Pages, so the
+// only alternatives were a secret embedded in a public page or a paid backend.
+// For a single-user dashboard this is the right trade; the Sync panel bridges it
+// back to the Python side for the Telegram alerts.
+var KEY='jes.triage.v1', HORIZON=14;
+var state={}, mode='upnext', selDate=null, showAll=false, undoStack=null;
+
+function load(){
+  try{ state=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }
+  catch(e){ state={}; }
+  // Merge the copy committed to the repo. Whichever side was marked more
+  // recently wins, so syncing on the laptop carries over to the phone without
+  // either device clobbering a newer decision made on the other.
+  var seed={};
+  try{ seed=JSON.parse(document.body.getAttribute('data-seed')||'{}')||{}; }
+  catch(e){ seed={}; }
+  var merged=0;
+  Object.keys(seed).forEach(function(u){
+    var s=seed[u], mine=state[u];
+    if(!s || !s.s) return;
+    if(!mine || (s.t||0) > (mine.t||0)){
+      state[u]={s:s.s, t:s.t||0, m:s.m||{}};
+      merged++;
+    }
+  });
+  if(merged){ save(); }
+}
+function save(){
+  try{ localStorage.setItem(KEY,JSON.stringify(state)); }
+  catch(e){ toast('Could not save - browser storage is blocked.'); }
+}
+function st(uid){ return (state[uid]||{}).s || ''; }
+
+var cards=[].slice.call(document.querySelectorAll('.ev[data-uid]'));
+var groups=[].slice.call(document.querySelectorAll('.day[data-date]'));
+var TODAY=document.body.getAttribute('data-today');
+
+// ---------------------------------------------------------------- filtering
+function visible(c){
+  var uid=c.getAttribute('data-uid'), s=st(uid);
+  var date=c.getAttribute('data-date');
+  var age=c.getAttribute('data-age'), changed=c.getAttribute('data-changed')==='1';
+  var future = date>=TODAY;
+  if(mode==='going')  return s==='going';
+  if(mode==='saved')  return s==='saved';
+  if(mode==='hidden') return s==='hidden';
+  if(mode==='new'){
+    if(s==='hidden') return false;
+    var isNew = age!=='' && parseInt(age,10)<=2;
+    return future && (( !s && isNew ) || changed);
+  }
+  if(mode==='calendar'){
+    if(s==='hidden') return false;
+    return selDate ? date===selDate : false;
+  }
+  // upnext
+  if(s) return false;
+  if(!future) return false;
+  if(showAll) return true;
+  return daysFrom(date)<HORIZON;
+}
+function daysFrom(iso){
+  return Math.round((new Date(iso+'T00:00:00')-new Date(TODAY+'T00:00:00'))/864e5);
+}
+
+function render(){
+  var shown=0;
+  cards.forEach(function(c){
+    var v=visible(c);
+    c.hidden=!v;
+    if(v) shown++;
+    var s=st(c.getAttribute('data-uid'));
+    c.classList.toggle('is-going',s==='going');
+    c.classList.toggle('is-saved',s==='saved');
+    c.classList.toggle('is-hidden',s==='hidden');
+    var btns=c.querySelectorAll('.tbtn');
+    for(var i=0;i<btns.length;i++){
+      btns[i].setAttribute('aria-pressed', String(btns[i].getAttribute('data-act')===s));
+    }
+    var lbl=c.querySelector('.state');
+    if(lbl) lbl.textContent = s==='going' ? 'Registered / attending'
+                            : s==='saved' ? 'Saved'
+                            : s==='hidden' ? 'Hidden from the main list' : '';
+  });
+  groups.forEach(function(g){
+    var any=g.querySelector('.ev:not([hidden])');
+    g.hidden=!any;
+  });
+  document.getElementById('calpanel').hidden = (mode!=='calendar');
+  document.getElementById('horizonbar').hidden = (mode!=='upnext');
+  document.getElementById('goingbar').hidden = (mode!=='going');
+  renderOrphans();
+  renderEmpty(shown);
+  counts();
+  if(mode==='calendar') paintCalendar();
+}
+
+function renderEmpty(shown){
+  var e=document.getElementById('empty');
+  if(shown>0 && !(mode==='calendar'&&!selDate)){ e.hidden=true; return; }
+  var msg={
+    upnext:'<b>Nothing left to triage.</b> Every upcoming event has been marked. Check <em>Saved</em> for the ones you were undecided about.',
+    'new':'<b>Nothing new.</b> No listings posted in the last 3 days, and nothing you are tracking has changed. That is a normal result - Bay Area events post 1-3 weeks ahead.',
+    calendar: selDate ? '<b>Nothing on '+selDate+'.</b> Pick another date.' : 'Pick a date above to see that day&rsquo;s events.',
+    going:'<b>Nothing marked as going yet.</b> Use <em>I am going</em> on an event once you have registered, and it will move here.',
+    saved:'<b>Nothing saved.</b> Use <em>Save for later</em> when you are undecided.',
+    hidden:'<b>Nothing hidden.</b> Anything you mark <em>Not interested</em> lands here, so it is never lost.'
+  }[mode]||'';
+  e.innerHTML=msg; e.hidden=!msg;
+}
+
+function counts(){
+  var n={upnext:0,'new':0,going:0,saved:0,hidden:0};
+  var m=mode;
+  ['upnext','new','going','saved','hidden'].forEach(function(k){
+    mode=k; n[k]=cards.filter(visible).length;
+  });
+  mode=m;
+  Object.keys(n).forEach(function(k){
+    var el=document.querySelector('.tab[data-panel="'+k+'"] .cnt');
+    if(el){ el.textContent=n[k]; el.classList.toggle('zero',n[k]===0); }
+  });
+}
+
+// ------------------------------------------------------- orphaned "going" items
+// An event marked "going" whose date has passed, or whose listing was pulled,
+// has no card in today's build. Showing the stored snapshot means a thing you
+// registered for never silently disappears.
+function renderOrphans(){
+  var box=document.getElementById('orphans');
+  box.innerHTML='';
+  if(mode!=='going') return;
+  var live={}; cards.forEach(function(c){ live[c.getAttribute('data-uid')]=1; });
+  Object.keys(state).forEach(function(uid){
+    if(state[uid].s!=='going' || live[uid]) return;
+    var m=state[uid].m||{};
+    var past = m.d && m.d < TODAY;
+    var d=document.createElement('div');
+    d.className='orphan';
+    d.innerHTML='<div class="t">'+esc(m.ti||'(untitled)')+'</div>'
+      +'<div class="m">'+esc(m.d||'?')+' '+esc(m.tm||'')+(m.v?' &middot; '+esc(m.v):'')
+      +' &mdash; '+(past?'already happened':'no longer in the current feed')+'</div>'
+      +(m.u?'<div class="m"><a href="'+esc(m.u)+'" target="_blank" rel="noopener">open listing</a></div>':'')
+      +'<div class="triage"><button class="tbtn" data-forget="'+esc(uid)+'">Remove from my list</button></div>';
+    box.appendChild(d);
+  });
+}
+function esc(t){ var d=document.createElement('div'); d.textContent=t==null?'':t; return d.innerHTML; }
+
+// ---------------------------------------------------------------- calendar
+function paintCalendar(){
+  var byDate={};
+  cards.forEach(function(c){
+    var uid=c.getAttribute('data-uid'), s=st(uid);
+    if(s==='hidden') return;
+    var d=c.getAttribute('data-date');
+    (byDate[d]=byDate[d]||{list:[],going:false});
+    if(s==='going'){ byDate[d].going=true; }
+    else if(!s){ byDate[d].list.push(c.getAttribute('data-verdict')); }
+  });
+  [].slice.call(document.querySelectorAll('.cell[data-cell]')).forEach(function(cell){
+    var d=cell.getAttribute('data-cell'), info=byDate[d];
+    var dots=cell.querySelector('.dots');
+    dots.innerHTML='';
+    cell.classList.toggle('sel', d===selDate);
+    var mark=cell.querySelector('.going'); if(mark) mark.remove();
+    if(info && info.going){
+      var g=document.createElement('span'); g.className='going'; g.textContent='●';
+      cell.appendChild(g);
+    }
+    var n=info?info.list.length:0;
+    cell.classList.toggle('none', n===0 && !(info&&info.going));
+    (info?info.list:[]).slice(0,4).forEach(function(v){
+      var e=document.createElement('span');
+      e.className='dot '+(v==='GO'?'go':v==='WORTH IT'?'worth':v==='MAYBE'?'maybe':'');
+      dots.appendChild(e);
+    });
+  });
+}
+
+// ---------------------------------------------------------------- .ics export
+function pad(n){ return (n<10?'0':'')+n; }
+function icsEscape(t){ return String(t||'').replace(/([,;\\])/g,'\\$1').replace(/\n/g,'\\n'); }
+function buildICS(){
+  var out=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//job-event-search//EN',
+           'CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+  var now=new Date();
+  var stamp=now.getUTCFullYear()+pad(now.getUTCMonth()+1)+pad(now.getUTCDate())+'T'
+           +pad(now.getUTCHours())+pad(now.getUTCMinutes())+pad(now.getUTCSeconds())+'Z';
+  var n=0;
+  cards.forEach(function(c){
+    var uid=c.getAttribute('data-uid');
+    if(st(uid)!=='going') return;
+    var startRaw=c.getAttribute('data-start');
+    if(!startRaw) return;
+    var dur=parseInt(c.getAttribute('data-dur')||'120',10);
+    // Floating local time: no VTIMEZONE needed and every calendar app reads it
+    // as the viewer's local time, which is correct for an in-person SF event.
+    var sd=new Date(startRaw.slice(0,4)+'-'+startRaw.slice(4,6)+'-'+startRaw.slice(6,8)
+                    +'T'+startRaw.slice(9,11)+':'+startRaw.slice(11,13)+':00');
+    var ed=new Date(sd.getTime()+dur*60000);
+    function fmt(d){ return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'
+                     +pad(d.getHours())+pad(d.getMinutes())+'00'; }
+    out.push('BEGIN:VEVENT');
+    out.push('UID:'+uid+'@job-event-search');
+    out.push('DTSTAMP:'+stamp);
+    out.push('DTSTART:'+fmt(sd));
+    out.push('DTEND:'+fmt(ed));
+    out.push('SUMMARY:'+icsEscape(c.getAttribute('data-title')));
+    var v=c.getAttribute('data-venue'); if(v) out.push('LOCATION:'+icsEscape(v));
+    out.push('DESCRIPTION:'+icsEscape('Score '+c.getAttribute('data-score')+'/100. '
+             +c.getAttribute('data-url')));
+    out.push('URL:'+icsEscape(c.getAttribute('data-url')));
+    out.push('END:VEVENT');
+    n++;
+  });
+  out.push('END:VCALENDAR');
+  return n? out.join('\r\n') : null;
+}
+function download(name,text,type){
+  var b=new Blob([text],{type:type||'text/plain'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download=name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },0);
+}
+
+// ---------------------------------------------------------------- toast + undo
+var toastEl;
+function toast(msg,undo){
+  if(!toastEl){
+    toastEl=document.createElement('div'); toastEl.className='toast';
+    document.body.appendChild(toastEl);
+  }
+  toastEl.innerHTML='<span></span>';
+  toastEl.firstChild.textContent=msg;
+  if(undo){
+    var b=document.createElement('button'); b.textContent='Undo';
+    b.onclick=function(){ undo(); toastEl.classList.remove('show'); };
+    toastEl.appendChild(b);
+  }
+  toastEl.classList.add('show');
+  clearTimeout(toastEl._t);
+  toastEl._t=setTimeout(function(){ toastEl.classList.remove('show'); }, undo?6000:2600);
+}
+
+// ---------------------------------------------------------------- interactions
+function setTriage(card,act){
+  var uid=card.getAttribute('data-uid');
+  var prev=state[uid]?JSON.parse(JSON.stringify(state[uid])):null;
+  if(st(uid)===act){ delete state[uid]; }
+  else{
+    state[uid]={s:act,t:Date.now(),m:{
+      ti:card.getAttribute('data-title'), d:card.getAttribute('data-date'),
+      tm:card.getAttribute('data-time'), v:card.getAttribute('data-venue'),
+      u:card.getAttribute('data-url')}};
+  }
+  save(); render();
+  var word={going:'Marked as going',saved:'Saved for later',hidden:'Hidden'}[act]
+            || 'Cleared';
+  toast(st(uid)?word:'Cleared', function(){
+    if(prev) state[uid]=prev; else delete state[uid];
+    save(); render();
+  });
+}
+
+document.addEventListener('click',function(e){
+  var t=e.target;
+  var tab=t.closest?t.closest('.tab'):null;
+  if(tab){
+    mode=tab.getAttribute('data-panel');
+    [].slice.call(document.querySelectorAll('.tab')).forEach(function(x){
+      x.setAttribute('aria-selected', String(x===tab));
+    });
+    render();
+    window.scrollTo({top:0,behavior:'smooth'});
+    return;
+  }
+  var btn=t.closest?t.closest('.tbtn[data-act]'):null;
+  if(btn){ setTriage(btn.closest('.ev'), btn.getAttribute('data-act')); return; }
+  var forget=t.closest?t.closest('[data-forget]'):null;
+  if(forget){
+    var u=forget.getAttribute('data-forget');
+    var prev=state[u]; delete state[u]; save(); render();
+    toast('Removed', function(){ state[u]=prev; save(); render(); });
+    return;
+  }
+  var cell=t.closest?t.closest('.cell[data-cell]'):null;
+  if(cell && !cell.classList.contains('out')){
+    var d=cell.getAttribute('data-cell');
+    selDate = (selDate===d)? null : d;
+    render();
+    return;
+  }
+  if(t.id==='horizon'){
+    showAll=!showAll;
+    t.textContent = showAll ? 'Show only the next 2 weeks'
+                            : 'Show the whole window';
+    render(); return;
+  }
+  if(t.id==='ics'){
+    var ics=buildICS();
+    if(!ics){ toast('Nothing marked as going yet.'); return; }
+    download('job-events.ics',ics,'text/calendar');
+    toast('Downloaded - open it to add these to your calendar.');
+    return;
+  }
+  if(t.closest && t.closest('[data-sync]')){
+    var box=document.getElementById('syncbox');
+    box.hidden=!box.hidden;
+    if(!box.hidden){
+      var slim={};
+      Object.keys(state).forEach(function(u){ slim[u]={s:state[u].s,t:state[u].t,m:state[u].m}; });
+      document.getElementById('syncjson').value=JSON.stringify(slim);
+    }
+    return;
+  }
+  if(t.id==='copysync'){
+    var ta=document.getElementById('syncjson');
+    ta.select();
+    navigator.clipboard.writeText(ta.value).then(
+      function(){ toast('Copied. Paste it into data/triage.json and commit.'); },
+      function(){ toast('Select the text and copy manually.'); });
+    return;
+  }
+  if(t.id==='dlsync'){
+    download('triage.json',document.getElementById('syncjson').value,'application/json');
+    toast('Saved triage.json - move it into data/ and commit.');
+    return;
+  }
+});
+
+load();
+render();
+})();
+"""
+
+
+def write_html(path, days, new_uids, meta, today, seed=None):
     fmt_day = "%A, %B %-d" if _dash() else "%A, %B %d"
     keys = sorted(days)
     tkey = today.isoformat()
@@ -272,7 +767,11 @@ def write_html(path, days, new_uids, meta, today):
            # it. Keep it out of search results: this page states that its owner is
            # job-hunting and roughly where they commute from.
            '<meta name="robots" content="noindex, nofollow, noarchive">',
-           '<title>Job-Event Search &mdash; SF</title><style>%s</style></head><body>' % CSS,
+           '<title>Job-Event Search &mdash; SF</title><style>%s</style></head>' % CSS,
+           # data/triage.json travels through git, so marks made on the laptop
+           # reach the phone. The client merges it into localStorage by recency.
+           '<body data-today="%s" data-seed="%s">'
+           % (_e(tkey), _e(json.dumps(seed or {}, separators=(",", ":")))),
            '<div class="wrap">']
     out.append("<h1>Where should I go to get hired?</h1>")
     out.append('<p class="sub">San Francisco &amp; Bay Area &nbsp;·&nbsp; window %s to %s '
@@ -289,81 +788,90 @@ def write_html(path, days, new_uids, meta, today):
         out.append('<div class="stat"><b>%s</b>%s</div>' % (_e(val), _e(label)))
     out.append('</div>')
 
-    # ---------- TODAY
-    if tkey in days:
-        out.append("<h2>Today &mdash; %s</h2>" % _e(today.strftime(fmt_day)))
-        sel = pick(days[tkey])
-        if not sel:
-            best = days[tkey][0].score if days[tkey] else 0
-            out.append('<div class="empty"><b>No worthwhile event found today.</b><br>'
-                       'Best candidate scored %d/100; the recommend threshold is %d. '
-                       'Use the evening for applications and referral follow-ups instead.</div>'
-                       % (best, config.MIN_SCORE_RECOMMEND))
-        for i, ev in enumerate(sel, 1):
-            out.append(_event_card(ev, ev.uid in new_uids, rank=i))
-        skips = [e for e in days[tkey] if config.MIN_SCORE_REVIEW <= e.score
-                 < config.MIN_SCORE_RECOMMEND][:3]
-        if skips:
-            out.append('<details><summary>Borderline events today that were '
-                       'not recommended (%d)</summary>' % len(skips))
-            for ev in skips:
-                out.append(_event_card(ev, False, compact=True))
-            out.append('</details>')
+    # ---------- tabs
+    tabs = [("upnext", "Up next", True), ("new", "New &amp; changed", False),
+            ("calendar", "Calendar", False), ("going", "Going", False),
+            ("saved", "Saved", False), ("hidden", "Hidden", False)]
+    out.append('<div class="tabs" role="tablist">')
+    for pid, label, sel in tabs:
+        cnt = "" if pid == "calendar" else '<span class="cnt">0</span>'
+        out.append('<button class="tab" role="tab" data-panel="%s" aria-selected="%s">'
+                   '%s%s</button>' % (pid, "true" if sel else "false", label, cnt))
+    out.append('</div>')
 
-    # ---------- THIS WEEK
-    out.append("<h2>Next 7 days</h2>")
-    for k in keys[:8]:
-        if k == tkey:
+    # ---------- calendar (hidden unless the Calendar tab is active)
+    out.append('<div id="calpanel" hidden>')
+    out.append(_month_grids(keys, today))
+    out.append('</div>')
+
+    # ---------- contextual toolbars
+    out.append('<div class="bar" id="horizonbar">'
+               '<button class="abtn" id="horizon">Show the whole window</button>'
+               '<button class="abtn" data-sync>Sync to the Telegram alerts</button>'
+               '</div>')
+    out.append('<div class="bar" id="goingbar" hidden>'
+               '<button class="abtn primary" id="ics">Add these to my calendar (.ics)</button>'
+               '<button class="abtn" data-sync>Sync to the Telegram alerts</button>'
+               '</div>')
+    out.append('<div class="sync" id="syncbox" hidden>'
+               '<p class="daynote">The dashboard keeps your choices in this browser only. '
+               'To let the daily Telegram alert know what you have registered for, copy '
+               'this into <code>data/triage.json</code> in the repo and commit it.</p>'
+               '<textarea id="syncjson" readonly></textarea>'
+               '<div class="bar"><button class="abtn primary" id="copysync">Copy</button>'
+               '<button class="abtn" id="dlsync">Download triage.json</button></div></div>')
+
+    out.append('<div id="empty" class="ghost" hidden></div>')
+    out.append('<div id="orphans"></div>')
+
+    # ---------- the single card pool, grouped by day. Every panel is a view over
+    #            this, so the calendar and the lists can never disagree.
+    for k in keys:
+        sel = pick(days[k])
+        if not sel:
             continue
         d = dt.date.fromisoformat(k)
-        sel = pick(days[k])
-        out.append('<div class="day"><div class="dayhead"><span class="d">%s</span>'
-                   '<span class="n">%d candidate%s scanned</span></div>'
-                   % (_e(d.strftime(fmt_day)), len(days[k]), "" if len(days[k]) == 1 else "s"))
-        if not sel:
-            best = days[k][0].score if days[k] else 0
-            out.append('<div class="empty">No worthwhile event found. '
-                       '(best candidate scored %d/100)</div>' % best)
+        label = d.strftime(fmt_day)
+        if k == tkey:
+            label = "Today &mdash; " + label
+        elif (d - today).days == 1:
+            label = "Tomorrow &mdash; " + label
+        out.append('<div class="day" data-date="%s"><div class="dayhead">'
+                   '<span class="d">%s</span><span class="n">%d candidate%s scanned</span>'
+                   '</div>' % (_e(k), label, len(days[k]),
+                               "" if len(days[k]) == 1 else "s"))
         for i, ev in enumerate(sel, 1):
             out.append(_event_card(ev, ev.uid in new_uids, rank=i))
         out.append('</div>')
 
-    # ---------- TOP OF THE WINDOW (full detail, any date)
-    everything = [e for k in keys for e in pick(days[k])]
-    beyond_week = [e for e in everything if e.date_key not in set(keys[:8])]
-    beyond_week.sort(key=lambda e: -e.score)
-    if beyond_week:
-        out.append("<h2>Highest value further out &mdash; register now</h2>")
-        out.append('<p class="sub" style="margin-top:-6px">These are past the next '
-                   'seven days, so they are easy to forget &mdash; and the good ones '
-                   'sell out or close registration first.</p>')
-        for i, ev in enumerate(beyond_week[:6], 1):
-            out.append(_event_card(ev, ev.uid in new_uids, rank=i))
-
-    # ---------- REST OF WINDOW
-    out.append("<h2>Everything else in the window</h2>")
-    shown = {id(e) for e in beyond_week[:6]}
-    later = [e for e in beyond_week if id(e) not in shown]
-    if later:
-        out.append('<table class="scan">')
-        for ev in later[:25]:
-            out.append('<tr><td class="s" style="color:%s">%d</td>'
-                       '<td><a href="%s" target="_blank" rel="noopener">%s</a><br>'
-                       '<span style="color:var(--dim);font-size:12px">%s · %s · %s</span></td></tr>'
-                       % (CAT_COLOR.get(ev.category, "#666"), ev.score, _e(ev.url), _e(ev.title),
-                          _e(ev.date_key), _e(ev.time_str or "time TBD"),
-                          _e(CATEGORIES[ev.category][0])))
-        out.append('</table>')
-    else:
-        out.append('<div class="empty">Nothing yet this far out. Bay Area events are '
-                   'typically posted 1&ndash;3 weeks ahead, so re-run daily.</div>')
+    # ---------- transparency: what was scanned and rejected
+    borderline = []
+    for k in keys:
+        borderline.extend([e for e in days[k]
+                           if config.MIN_SCORE_REVIEW <= e.score < config.MIN_SCORE_RECOMMEND])
+    borderline.sort(key=lambda e: -e.score)
+    if borderline:
+        out.append('<details style="margin-top:26px"><summary>Borderline events across '
+                   'the whole window that were scanned but not recommended (%d)</summary>'
+                   % len(borderline))
+        out.append('<p class="daynote">Shown so you can audit the filter. If something '
+                   'here looks like it should have been recommended, that is a scoring '
+                   'bug worth fixing.</p>')
+        for ev in borderline[:20]:
+            out.append(_event_card(ev, False, compact=True))
+        out.append('</details>')
 
     out.append('<div class="foot">Sources: Luma public event API, Meetup public search '
                'pages, HackerX JSON-LD, Eventbrite public browse pages. No logins, '
                'no CAPTCHA bypass, no paid APIs, no attendee personal data stored. '
                'Scores are rule-based and fully itemised above &mdash; nothing here is '
-               'generated by a language model.</div>')
-    out.append('</div></body></html>')
+               'generated by a language model.<br><br>Your Going / Saved / Hidden marks '
+               'are stored in this browser only (localStorage) and are never uploaded. '
+               'They survive the daily rebuild because each event has a stable id, but '
+               'they do not follow you to another device.</div>')
+    out.append('</div>')
+    out.append('<script>%s</script>' % JS)
+    out.append('</body></html>')
 
     outdir = os.path.dirname(path) or "."
     os.makedirs(outdir, exist_ok=True)

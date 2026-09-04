@@ -263,6 +263,9 @@ class Event:
     openings: List[Dict[str, Any]] = field(default_factory=list)
     opening_summary: str = ""
     changed_note: str = ""
+    # Days since this listing was first seen by any run. Powers the "New" tab, so
+    # that missing a day does not mean missing everything posted that day.
+    age_days: Optional[int] = None
     gate: str = ""                      # non-empty => excluded, with the reason
 
     # ---- convenience

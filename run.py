@@ -14,7 +14,7 @@ import hashlib
 import sys
 import time
 
-from jobevents import config, enrich, feedback, http, report, score, store
+from jobevents import config, enrich, feedback, http, report, score, store, triage
 from jobevents.advice import annotate
 from jobevents.dedupe import dedupe
 from jobevents.models import local_now, norm_title_key
@@ -116,6 +116,8 @@ def main(argv=None):
     log("=" * 74)
     con = store.connect()
     priors = feedback.organizer_priors(feedback.connect())
+    marks = triage.load()
+    log("  " + triage.summary(marks))
     if priors:
         log("  organiser priors learned from your logged events: %d" % len(priors))
     else:
@@ -151,6 +153,18 @@ def main(argv=None):
 
     # ---- persist
     new_uids, changed = store.upsert(con, events + gated)
+
+    # How long each listing has been known. new_uids only covers THIS run, so on its
+    # own it makes a missed day invisible; age lets the dashboard show "posted in the
+    # last 3 days" instead.
+    seen = dict(con.execute("SELECT uid, first_seen FROM events").fetchall())
+    for ev in events:
+        fs = seen.get(ev.uid)
+        if fs:
+            try:
+                ev.age_days = (now.date() - dt.date.fromisoformat(fs[:10])).days
+            except ValueError:
+                ev.age_days = None
 
     # Refuse to emit a dashboard built from a crippled collection run. Only applies
     # to a normal full-window run - a deliberate short --days window legitimately
@@ -194,7 +208,8 @@ def main(argv=None):
     jp = report.write_json(config.OUT_DIR + "/digest.json", by_date, new_uids, meta)
 
     from jobevents.html_report import write_html
-    hp = write_html(config.OUT_DIR + "/index.html", by_date, new_uids, meta, now.date())
+    hp = write_html(config.OUT_DIR + "/index.html", by_date, new_uids, meta,
+                    now.date(), seed=marks)
 
     log("\n" + "=" * 74)
     log("  %d raw -> %d unique -> %d recommended across %d days   (%.0fs, %d HTTP, %d cached)"

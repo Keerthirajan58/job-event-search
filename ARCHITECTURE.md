@@ -398,6 +398,54 @@ anywhere in the window**, not just the next seven days — previously WorkOS Dem
 on Sept 14 and the Codex meetup on Sept 24 appeared only as one-line table rows, so
 their cost, companies, openings and opener were invisible until the date came close.
 
+## 5d. Phase 8 — the dashboard becomes a tool you operate
+
+Four changes, in the order they mattered.
+
+**Triage state (Going / Saved / Hidden).** The hard question was where state lives.
+GitHub Pages serves static files; writing from the page would need a token in a public
+repo, and a backend costs money. So marks live in `localStorage`, which is the right
+answer for one user and turns out to be sufficient because event ids are stable —
+`sha1(normalised title | date | city)` does not move when a listing is re-scraped, so
+last night's marks still attach this morning. Verified before building anything else,
+since the whole feature collapses if ids churn.
+
+Two consequences handled rather than ignored: marks do not follow you between devices,
+and the Python side cannot see them. Both are solved by the same file — the Sync button
+exports `data/triage.json`, which is committed, embedded in the next build, and merged
+client-side **by recency**, so the laptop and the phone converge without either
+clobbering a newer decision. That file is also what lets the alerts know what you
+already registered for.
+
+**One card pool, six views.** Rather than six DOM containers with cards moved between
+them, every recommended event is rendered once inside a day-grouped pool and each tab
+is a *filter* over it. Nothing is duplicated, so the calendar and the lists cannot
+disagree, and the calendar is annotated from the same DOM the lists read.
+
+**Calendar.** A server-rendered month grid; JS only annotates counts, verdict-coloured
+dots, and a marker on days you are already attending something. Tapping a date filters
+to it. This was the cheapest of the four features and removed the most friction — the
+window is 61 days, and scrolling it was the actual complaint.
+
+**Alerts instead of a digest.** Covered in the README; the design point is that the
+valuable behaviour is *silence*, and that non-repetition had to be enforced in a table
+of `(uid, kind)` rather than hoped for.
+
+Bugs this phase produced and what caught them:
+
+| bug | found by |
+|---|---|
+| two toolbars both used `id="dosync"` — duplicate ids, and `getElementById` finds only the first | a duplicate-id scan of the emitted HTML |
+| `import json` was inserted against `import html`, but the module aliases `import html as H`, so the seed crashed the run | the run failing outright |
+| `actions/cache` was set to `path: data`, which would have restored a stale copy over the committed `attendance.db` and `triage.json` | reviewing what the cache actually covers against what git tracks |
+| calendar legend referenced Python colour constants that never existed | first build after the rewrite |
+
+The interactive layer is covered by 38 assertions run in jsdom (`scratchpad/test_dash.js`,
+`test_seed.js`): tab switching, horizon toggle, each triage transition, undo, calendar
+selection and annotation, `.ics` generation, the sync payload, reload persistence, and
+both directions of the recency merge. A JS syntax error would silently break the entire
+page, so `node --check` runs over the extracted script as well.
+
 ## 6. Failure modes
 
 | Failure | Likelihood | Blast radius | Mitigation in place |
@@ -440,7 +488,8 @@ per-event fit/who-to-meet/opener · SQLite history with `NEW` detection · `dige
 - [x] **Phase 5** — feedback loop and learned organiser prior *(done)*
 - [x] **Phase 6** — verdict badges, change detection, extended window to Oct 31 *(done)*
 - [x] **Phase 7** — daily automation: GitHub Actions cron + Pages *(done; `./deploy.sh`)*
-- [ ] **Phase 8** — optional push: Telegram webhook, opt-in via env var *(code included)*
+- [x] **Phase 8** — interactive triage, New/changed view, calendar, alert-based
+      Telegram *(done)*
 
 The feedback loop is now in place but has no data. It becomes the most valuable part of
 the system after roughly 20-30 logged events, at which point it starts overriding my

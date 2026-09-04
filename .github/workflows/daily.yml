@@ -8,9 +8,10 @@
 #     regenerable 5 MB binary; committing it daily would add ~50 MB of pack per
 #     two months. The cache only powers "NEW"/"changed" flags, so losing it is
 #     harmless - everything simply reads as new once.
-#  2. data/attendance.db IS committed (12 KB) and is checked out normally. It holds
-#     your logged outcomes, which are irreplaceable and which the organiser prior
-#     needs in order to affect the published dashboard.
+#  2. data/attendance.db and data/triage.json ARE committed and checked out
+#     normally. They hold your logged outcomes and your Going/Saved/Hidden marks -
+#     irreplaceable, tiny, and needed by the organiser prior and the alerts. The
+#     cache therefore names individual regenerable paths, never the whole data/ dir.
 #  3. The `secrets` context is not available in step-level `if:`. The optional
 #     notification step therefore maps the secret to env and tests the env var.
 name: daily-digest
@@ -50,10 +51,15 @@ jobs:
 
       # Rotating key: the cache is immutable once written, so a run-scoped key
       # plus a prefix restore-key gives us "load newest, save fresh".
+      # Cache ONLY the regenerable files. Caching the whole data/ directory would
+      # restore a stale copy over data/attendance.db and data/triage.json, both of
+      # which are committed to git and are the irreplaceable half of the state.
       - name: Restore event history
         uses: actions/cache@v4
         with:
-          path: data
+          path: |
+            data/cache
+            data/events.db
           key: jobevents-data-${{ github.run_id }}
           restore-keys: |
             jobevents-data-
@@ -66,6 +72,8 @@ jobs:
           test -s out/index.html || { echo "::error::index.html missing or empty"; exit 1; }
           test -s out/digest.json || { echo "::error::digest.json missing"; exit 1; }
           grep -q 'noindex' out/index.html || { echo "::error::noindex meta missing"; exit 1; }
+          grep -q 'data-panel="calendar"' out/index.html || { echo "::error::tab bar missing"; exit 1; }
+          grep -q 'jes.triage' out/index.html || { echo "::error::triage script missing"; exit 1; }
           python3 -c "import json;d=json.load(open('out/digest.json'));print('events:',d['meta']['unique_events'],'recommended:',d['meta']['recommended'])"
 
       - name: Summary
