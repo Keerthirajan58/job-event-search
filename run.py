@@ -14,7 +14,8 @@ import hashlib
 import sys
 import time
 
-from jobevents import config, enrich, feedback, http, report, score, store, triage
+from jobevents import (config, enrich, feedback, history, http, report, score,
+                       store, triage)
 from jobevents.advice import annotate
 from jobevents.dedupe import dedupe
 from jobevents.models import local_now, norm_title_key
@@ -154,17 +155,18 @@ def main(argv=None):
     # ---- persist
     new_uids, changed = store.upsert(con, events + gated)
 
-    # How long each listing has been known. new_uids only covers THIS run, so on its
-    # own it makes a missed day invisible; age lets the dashboard show "posted in the
-    # last 3 days" instead.
-    seen = dict(con.execute("SELECT uid, first_seen FROM events").fetchall())
+    # How long each listing has been known. This comes from the committed
+    # first_seen.json rather than the database: the DB is gitignored and survives CI
+    # only via actions/cache, so when that cache missed, every event looked new and
+    # the "New" tab listed the entire window.
+    known = history.load()
+    all_uids = {e.uid for e in events + gated}
+    known = history.save(known, all_uids, today=now.date())
     for ev in events:
-        fs = seen.get(ev.uid)
-        if fs:
-            try:
-                ev.age_days = (now.date() - dt.date.fromisoformat(fs[:10])).days
-            except ValueError:
-                ev.age_days = None
+        ev.age_days = history.age_days(known, ev.uid, now.date())
+    fresh = sum(1 for e in events if e.age_days == 0)
+    log("  first-seen history: %d listings tracked, %d first seen today"
+        % (len(known), fresh))
 
     # Refuse to emit a dashboard built from a crippled collection run. Only applies
     # to a normal full-window run - a deliberate short --days window legitimately

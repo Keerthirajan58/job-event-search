@@ -4,14 +4,15 @@
 #
 # Design notes, because three obvious approaches do not work:
 #
-#  1. State is restored with actions/cache, NOT committed. data/events.db is a
-#     regenerable 5 MB binary; committing it daily would add ~50 MB of pack per
-#     two months. The cache only powers "NEW"/"changed" flags, so losing it is
-#     harmless - everything simply reads as new once.
-#  2. data/attendance.db and data/triage.json ARE committed and checked out
-#     normally. They hold your logged outcomes and your Going/Saved/Hidden marks -
-#     irreplaceable, tiny, and needed by the organiser prior and the alerts. The
-#     cache therefore names individual regenerable paths, never the whole data/ dir.
+#  1. data/events.db is restored with actions/cache, NOT committed: a regenerable
+#     5 MB binary would add ~50 MB of pack per two months.
+#  2. first_seen dates are the exception. They are the one thing in that database
+#     that cannot be recomputed, and relying on the cache for them was a real bug -
+#     when it missed, every listing read as brand new and the "New" tab showed the
+#     entire window. They now live in data/first_seen.json, which this job commits
+#     back after every run. Same for data/attendance.db and data/triage.json, which
+#     hold logged outcomes and Going/Saved marks. The cache therefore names
+#     individual regenerable paths, never the whole data/ dir.
 #  3. The `secrets` context is not available in step-level `if:`. The optional
 #     notification step therefore maps the secret to env and tests the env var.
 name: daily-digest
@@ -27,7 +28,7 @@ on:
     paths-ignore: ["**.md"]
 
 permissions:
-  contents: read
+  contents: write      # to commit data/first_seen.json back after each run
   pages: write
   id-token: write
 
@@ -64,8 +65,30 @@ jobs:
           restore-keys: |
             jobevents-data-
 
+      - name: Unit tests (no network, no build needed)
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+
       - name: Generate digest
         run: python3 run.py
+
+      - name: Dashboard tests
+        run: |
+          npm install --no-save --no-audit --no-fund --silent jsdom
+          node tests/dashboard.test.js
+
+      # first_seen.json is the durable half of the state. Committing it is what
+      # makes the "New" tab mean anything the day after a cache eviction.
+      - name: Persist first-seen history
+        run: |
+          if [ -n "$(git status --porcelain data/first_seen.json)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/first_seen.json
+            git commit -m "chore: first-seen history $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "no change to first-seen history"
+          fi
 
       - name: Check the artifact is real
         run: |
@@ -74,6 +97,17 @@ jobs:
           grep -q 'noindex' out/index.html || { echo "::error::noindex meta missing"; exit 1; }
           grep -q 'data-panel="calendar"' out/index.html || { echo "::error::tab bar missing"; exit 1; }
           grep -q 'jes.triage' out/index.html || { echo "::error::triage script missing"; exit 1; }
+          test -s data/first_seen.json || { echo "::error::first_seen history missing"; exit 1; }
+          # If literally everything reads as new, first_seen was lost again.
+          python3 - <<'PY'
+          import json, sys
+          d = json.load(open("out/digest.json"))
+          rec = [e for v in d["days"].values() for e in v["recommended"]]
+          if len(rec) > 20 and all(e.get("age_days") == 0 for e in rec):
+              sys.exit("::error::every listing reads as first-seen-today - history was lost")
+          print("age check ok: %d/%d first seen today"
+                % (sum(1 for e in rec if e.get("age_days") == 0), len(rec)))
+          PY
           python3 -c "import json;d=json.load(open('out/digest.json'));print('events:',d['meta']['unique_events'],'recommended:',d['meta']['recommended'])"
 
       - name: Summary

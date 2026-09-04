@@ -99,94 +99,170 @@ padding:9px 12px;border-radius:0 7px 7px 0;font-size:13px;margin:10px 0 0}
 .fup{font-size:13px;color:var(--dim);margin-top:6px;padding-left:12px;
 border-left:2px solid var(--line)}
 
+/* ---------------------------------------------------- header summary */
+.summary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+margin:0 0 18px;font-size:12.5px;color:var(--dim)}
+.summary .pill{background:var(--card);border:1px solid var(--line);border-radius:20px;
+padding:4px 11px;font-weight:600;color:var(--ink)}
+details.stats-d{margin:0 0 18px}
+details.stats-d>summary{cursor:pointer;font-size:12.5px;color:var(--dim);
+list-style:none;display:inline-flex;align-items:center;gap:6px;
+border:1px solid var(--line);border-radius:20px;padding:4px 12px;background:var(--card)}
+details.stats-d>summary::-webkit-details-marker{display:none}
+details.stats-d>summary:hover{border-color:var(--accent);color:var(--ink)}
+details.stats-d>summary::after{content:"\25be";font-size:10px}
+details.stats-d[open]>summary::after{content:"\25b4"}
+details.stats-d .stats{margin-top:12px}
+
 /* ---------------------------------------------------- tabs */
-.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:20px 0 4px;
-position:sticky;top:0;z-index:20;background:var(--bg);padding:8px 0;
-border-bottom:1px solid var(--line)}
+.tabbar{position:sticky;top:0;z-index:30;background:var(--bg);padding:10px 0 0;
+margin:18px 0 16px;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding-bottom:10px}
+.tabsep{width:1px;align-self:stretch;background:var(--line);margin:2px 6px}
 .tab{appearance:none;border:1px solid var(--line);background:var(--card);
-color:var(--fg);font:inherit;font-size:13px;font-weight:600;padding:7px 13px;
-border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-.tab:hover{border-color:var(--accent)}
-.tab[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
-.tab .cnt{font-size:11px;font-weight:700;padding:1px 6px;border-radius:10px;
-background:rgba(0,0,0,.14)}
-.tab[aria-selected="true"] .cnt{background:rgba(255,255,255,.25)}
-.tab .cnt.zero{opacity:.45}
-.panel[hidden]{display:none!important}
+color:var(--fg);font:inherit;font-size:13px;font-weight:600;padding:8px 14px;
+border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+transition:border-color .12s,background .12s,color .12s}
+.tab .dotc{width:7px;height:7px;border-radius:50%;background:var(--tc);flex:none}
+.tab:hover{border-color:var(--tc)}
+.tab[aria-selected="true"]{background:var(--tc);border-color:var(--tc);color:#fff}
+.tab[aria-selected="true"] .dotc{background:rgba(255,255,255,.85)}
+.tab .cnt{font-size:11px;font-weight:800;padding:1px 7px;border-radius:10px;
+background:var(--line);color:var(--fg);min-width:18px;text-align:center}
+.tab[aria-selected="true"] .cnt{background:rgba(255,255,255,.26);color:#fff}
+.tab .cnt.zero{opacity:.5}
+.t-upnext{--tc:#1462b5}.t-new{--tc:#c2410c}.t-calendar{--tc:#6d28d9}
+.t-going{--tc:#15803d}.t-saved{--tc:#0e7490}.t-hidden{--tc:#6b7280}
+
+/* ---------------------------------------------------- action buttons */
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 16px}
+.bar .spacer{flex:1 1 auto}
+.abtn{appearance:none;border:1px solid var(--line);background:var(--card);
+color:var(--fg);font:inherit;font-size:12.5px;font-weight:600;padding:8px 13px;
+border-radius:8px;cursor:pointer;text-decoration:none;display:inline-flex;
+align-items:center;gap:7px;transition:border-color .12s,background .12s}
+.abtn:hover{border-color:var(--accent);background:rgba(20,98,181,.06)}
+.abtn.dl{background:#0f766e;border-color:#0f766e;color:#fff}
+.abtn.dl:hover{background:#115e56;border-color:#115e56}
+.abtn.quiet{border-style:dashed;color:var(--dim);font-weight:500}
+.abtn.quiet:hover{color:var(--ink)}
 
 /* ---------------------------------------------------- triage controls */
-.triage{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0;
-padding-top:10px;border-top:1px dashed var(--line)}
-.tbtn{appearance:none;border:1px solid var(--line);background:transparent;
-color:var(--fg);font:inherit;font-size:12.5px;font-weight:600;padding:6px 12px;
-border-radius:6px;cursor:pointer;transition:background .12s,border-color .12s}
-.tbtn:hover{border-color:var(--accent);background:rgba(20,98,181,.07)}
-.tbtn[aria-pressed="true"]{color:#fff;border-color:transparent}
-.tbtn.go[aria-pressed="true"]{background:var(--good)}
-.tbtn.save[aria-pressed="true"]{background:var(--accent)}
-.tbtn.hide[aria-pressed="true"]{background:var(--dim)}
-.state{font-size:12px;color:var(--dim);align-self:center;margin-left:auto}
-.ev.is-going{border-left:3px solid var(--good)}
-.ev.is-saved{border-left:3px solid var(--accent)}
-.ev.is-hidden{opacity:.55}
+.triage{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0 0;
+padding-top:12px;border-top:1px dashed var(--line)}
+.tbtn{appearance:none;font:inherit;font-size:12.5px;font-weight:650;
+padding:8px 14px;border-radius:8px;cursor:pointer;border:1.5px solid var(--bc);
+background:var(--bg2);color:var(--bc);box-shadow:0 1px 0 rgba(0,0,0,.04);
+display:inline-flex;align-items:center;gap:6px;transition:all .12s}
+.tbtn:hover{background:var(--bc);color:#fff}
+.tbtn[aria-pressed="true"]{background:var(--bc);color:#fff;
+box-shadow:inset 0 1px 2px rgba(0,0,0,.2)}
+.tbtn.go{--bc:#15803d;--bg2:rgba(21,128,61,.09)}
+.tbtn.save{--bc:#0e7490;--bg2:rgba(14,116,144,.09)}
+.tbtn.hide{--bc:#6b7280;--bg2:rgba(107,114,128,.09)}
+.state{font-size:12px;color:var(--dim);margin-left:auto;font-weight:600}
+.ev.is-going{border-left:3px solid #15803d}
+.ev.is-saved{border-left:3px solid #0e7490}
+.ev.is-hidden{opacity:.6}
 
-/* ---------------------------------------------------- calendar */
-.calwrap{margin:14px 0 0}
-.cal{margin-bottom:22px}
-.cal h3{font-size:15px;margin:0 0 8px;font-weight:700}
-.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+/* ---------------------------------------------------- calendar
+   NOTE: these are .cday, not .cell. The event cost strip already owns .cell, and
+   an earlier version of this file collided with it - every "Getting there" box
+   inherited aspect-ratio:1/1 and grew into a huge square. */
+.calnav{display:flex;gap:8px;align-items:center;margin:0 0 14px;flex-wrap:wrap}
+.calnav select{font:inherit;font-size:13px;font-weight:600;padding:7px 10px;
+border:1px solid var(--line);border-radius:8px;background:var(--card);
+color:var(--fg);cursor:pointer}
+.calnav .nav{appearance:none;border:1px solid var(--line);background:var(--card);
+color:var(--fg);width:34px;height:34px;border-radius:8px;cursor:pointer;
+font-size:15px;line-height:1;display:inline-flex;align-items:center;
+justify-content:center}
+.calnav .nav:hover:not(:disabled){border-color:var(--accent)}
+.calnav .nav:disabled{opacity:.35;cursor:default}
+.cal{margin-bottom:8px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .dow{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
 color:var(--dim);text-align:center;padding:4px 0;font-weight:700}
-.cell{aspect-ratio:1/1;border:1px solid var(--line);border-radius:7px;
-background:var(--card);padding:5px 4px 4px;display:flex;flex-direction:column;
+.cday{aspect-ratio:1/1;border:1px solid var(--line);border-radius:9px;
+background:var(--card);padding:6px 4px 4px;display:flex;flex-direction:column;
 align-items:center;justify-content:flex-start;cursor:pointer;position:relative;
-font-size:13px;min-height:46px}
-.cell.out{opacity:.28;cursor:default;background:transparent;border-color:transparent}
-.cell.none{cursor:default;color:var(--dim)}
-.cell:not(.out):not(.none):hover{border-color:var(--accent)}
-.cell.sel{outline:2px solid var(--accent);outline-offset:-2px}
-.cell.today .dnum{background:var(--fg);color:var(--bg);border-radius:50%;
-width:20px;height:20px;display:flex;align-items:center;justify-content:center}
-.cell .dnum{font-weight:650;line-height:20px;height:20px}
-.cell .dots{display:flex;gap:2px;margin-top:3px;flex-wrap:wrap;
+font-size:13px;min-height:44px;transition:border-color .12s,background .12s}
+.cday.out{opacity:.25;cursor:default;background:transparent;border-color:transparent}
+.cday.none{cursor:default;color:var(--dim)}
+.cday:not(.out):not(.none):hover{border-color:var(--accent);
+background:rgba(20,98,181,.06)}
+.cday.sel{border-color:var(--accent);background:rgba(20,98,181,.12);
+box-shadow:inset 0 0 0 1px var(--accent)}
+.cday.today .dnum{background:var(--fg);color:var(--bg);border-radius:50%;
+width:21px;height:21px;display:flex;align-items:center;justify-content:center}
+.cday .dnum{font-weight:650;line-height:21px;height:21px}
+.cday .dots{display:flex;gap:2px;margin-top:4px;flex-wrap:wrap;
 justify-content:center;max-width:100%}
-.cell .dot{width:5px;height:5px;border-radius:50%;background:var(--dim)}
-.cell .dot.go{background:var(--good)}.cell .dot.worth{background:var(--accent)}
-.cell .dot.maybe{background:var(--warn)}
-.cell .going{position:absolute;top:2px;right:3px;font-size:9px;color:var(--good);
-font-weight:800}
+.cday .dot{width:5px;height:5px;border-radius:50%;background:var(--dim)}
+.cday .dot.go{background:var(--good)}.cday .dot.worth{background:var(--accent)}
+.cday .dot.maybe{background:var(--warn)}
+.cday .going{position:absolute;top:3px;right:4px;font-size:9px;color:var(--good)}
 .callegend{font-size:11.5px;color:var(--dim);display:flex;gap:14px;flex-wrap:wrap;
-margin:2px 0 16px}
+margin:10px 0 18px;align-items:center}
 .callegend span{display:inline-flex;align-items:center;gap:5px}
 .callegend i{width:6px;height:6px;border-radius:50%;display:inline-block}
 
+/* ---------------------------------------------------- brief day list */
+.briefhead{font-size:13px;font-weight:700;margin:18px 0 9px}
+.brief{display:flex;flex-direction:column;gap:7px}
+.brow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);
+border-radius:9px;background:var(--card);padding:11px 13px}
+.brow .bt{font-size:12.5px;font-weight:700;color:var(--dim);flex:none;
+min-width:66px;font-variant-numeric:tabular-nums}
+.brow .bn{font-size:14px;font-weight:600;flex:1 1 auto;min-width:0;
+overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brow .bs{font-size:11.5px;font-weight:800;padding:3px 8px;border-radius:20px;
+flex:none;color:#fff}
+.brow .bg{font-size:10px;font-weight:800;color:var(--good);flex:none}
+.brow .bx{appearance:none;border:1px solid var(--line);background:var(--bg);
+color:var(--fg);width:32px;height:32px;border-radius:8px;cursor:pointer;flex:none;
+font-size:14px;line-height:1;display:inline-flex;align-items:center;
+justify-content:center}
+.brow .bx:hover{border-color:var(--accent);background:rgba(20,98,181,.09)}
+
+/* ---------------------------------------------------- expanded card */
+#modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;
+justify-content:center;padding:22px 14px}
+#modal .backdrop{position:absolute;inset:0;background:rgba(15,18,22,.55);
+backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+#modal .sheet{position:relative;background:var(--bg);border:1px solid var(--line);
+border-radius:14px;max-width:760px;width:100%;max-height:88vh;overflow:auto;
+box-shadow:0 24px 70px rgba(0,0,0,.4);padding:14px}
+#modal .close{position:sticky;top:0;float:right;appearance:none;border:1px solid
+var(--line);background:var(--card);color:var(--fg);width:34px;height:34px;
+border-radius:50%;cursor:pointer;font-size:19px;line-height:1;z-index:2;
+display:flex;align-items:center;justify-content:center}
+#modal .close:hover{border-color:var(--bad);color:var(--bad)}
+#modal .ev{display:block!important;margin:0;border:none;box-shadow:none;padding:4px}
+body.modal-open{overflow:hidden}
+
 /* ---------------------------------------------------- misc chrome */
-.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0 6px}
-.abtn{appearance:none;border:1px solid var(--line);background:var(--card);
-color:var(--fg);font:inherit;font-size:12.5px;font-weight:600;padding:7px 12px;
-border-radius:6px;cursor:pointer;text-decoration:none;display:inline-block}
-.abtn:hover{border-color:var(--accent)}
-.abtn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(80px);
-background:var(--fg);color:var(--bg);padding:11px 16px;border-radius:8px;
-font-size:13px;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.25);z-index:100;
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(90px);
+background:var(--fg);color:var(--bg);padding:11px 16px;border-radius:9px;
+font-size:13px;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.25);z-index:300;
 display:flex;align-items:center;gap:14px;transition:transform .2s;max-width:92vw}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .toast button{appearance:none;background:transparent;border:1px solid currentColor;
 color:inherit;font:inherit;font-size:12px;font-weight:700;padding:3px 10px;
 border-radius:5px;cursor:pointer}
-.ghost{border:1px dashed var(--line);border-radius:9px;padding:14px 16px;
-color:var(--dim);font-size:13px;margin:10px 0}
+.ghost{border:1px dashed var(--line);border-radius:10px;padding:16px 18px;
+color:var(--dim);font-size:13px;margin:10px 0;line-height:1.55}
 .ghost b{color:var(--fg)}
 .orphan{border:1px solid var(--line);border-left:3px solid var(--warn);
 border-radius:9px;padding:12px 14px;margin:0 0 10px;background:var(--card)}
 .orphan .t{font-weight:650;font-size:14.5px}
 .orphan .m{font-size:12.5px;color:var(--dim);margin-top:3px}
-.sync{margin-top:10px}
-.sync textarea{width:100%;min-height:74px;font-family:ui-monospace,SFMono-Regular,
+.sync{margin-top:12px;border:1px solid var(--line);border-radius:10px;
+padding:14px;background:var(--card)}
+.sync textarea{width:100%;min-height:70px;font-family:ui-monospace,SFMono-Regular,
 Menlo,monospace;font-size:11px;border:1px solid var(--line);border-radius:7px;
-padding:9px;background:var(--card);color:var(--fg);resize:vertical}
-.daynote{font-size:12px;color:var(--dim);margin:2px 0 8px}
+padding:9px;background:var(--bg);color:var(--fg);resize:vertical;margin:8px 0}
+.daynote{font-size:12px;color:var(--dim);margin:2px 0 8px;line-height:1.5}
 """
 
 
@@ -220,10 +296,10 @@ def _event_card(ev, is_new, rank=0, compact=False):
     # counts, builds the calendar and writes .ics entirely from these, so there is
     # no second copy of the event data to keep in sync.
     dur = (ev.cost or {}).get("event_minutes") or 120
-    p = ['<div class="%s" data-uid="%s" data-date="%s" data-start="%s" data-dur="%d" '
+    p = ['<div class="%s"%s data-uid="%s" data-date="%s" data-start="%s" data-dur="%d" '
          'data-score="%d" data-verdict="%s" data-age="%s" data-changed="%d" '
          'data-title="%s" data-venue="%s" data-url="%s" data-time="%s">'
-         % (cls, _e(ev.uid), _e(ev.date_key),
+         % (cls, ' data-compact="1"' if compact else "", _e(ev.uid), _e(ev.date_key),
             _e(ev.start.strftime("%Y%m%dT%H%M%S") if ev.start else ""), dur,
             ev.score, _e(v), "" if ev.age_days is None else ev.age_days,
             1 if ev.changed_note else 0,
@@ -373,265 +449,294 @@ def _event_card(ev, is_new, rank=0, compact=False):
     return "".join(p)
 
 
-def _month_grids(keys, today):
-    """Server-rendered month grids for the window. JS annotates them from the card
-    pool, so the calendar can never disagree with the list."""
-    if not keys:
-        return ""
-    first = dt.date.fromisoformat(keys[0])
-    last = dt.date.fromisoformat(keys[-1])
-    in_window = set(keys)
-    out = ['<div class="calwrap">']
-    out.append('<div class="callegend">'
-               '<span><i style="background:var(--good)"></i>GO</span>'
-               '<span><i style="background:var(--accent)"></i>worth it</span>'
-               '<span><i style="background:var(--warn)"></i>maybe</span>'
-               '<span><b style="color:var(--good)">&#9679;</b>&nbsp;you are going</span>'
-               '<span>Tap a date to see that day only.</span>'
-               '</div>')
-    cur = dt.date(first.year, first.month, 1)
-    while cur <= last:
-        out.append('<div class="cal"><h3>%s</h3><div class="grid">' % cur.strftime("%B %Y"))
-        for d in ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"):
-            out.append('<div class="dow">%s</div>' % d)
-        # Monday-first offset
-        lead = cur.weekday()
-        for _ in range(lead):
-            out.append('<div class="cell out"></div>')
-        day = cur
-        while day.month == cur.month:
-            iso = day.isoformat()
-            cls = "cell"
-            if iso not in in_window:
-                cls += " out"
-            if day == today:
-                cls += " today"
-            out.append('<div class="%s" data-cell="%s"><span class="dnum">%d</span>'
-                       '<span class="dots"></span></div>' % (cls, iso, day.day))
-            day += dt.timedelta(days=1)
-        out.append('</div></div>')
-        cur = (cur.replace(day=28) + dt.timedelta(days=4)).replace(day=1)
-    out.append('</div>')
-    return "".join(out)
-
-
 JS = r"""
 (function(){
 'use strict';
 // Triage state lives in localStorage. The page is static on GitHub Pages, so the
-// only alternatives were a secret embedded in a public page or a paid backend.
-// For a single-user dashboard this is the right trade; the Sync panel bridges it
-// back to the Python side for the Telegram alerts.
-var KEY='jes.triage.v1', HORIZON=14;
-var state={}, mode='upnext', selDate=null, showAll=false, undoStack=null;
+// alternatives were a write token embedded in a public repo, or a paid backend.
+// Marks survive the nightly rebuild because event ids are stable.
+var KEY='jes.triage.v1', HORIZON=14, NEW_MAX_AGE=1;
+var state={}, mode='upnext', selDate=null, showAll=false;
+var calY=0, calM=0, modalCard=null, modalHome=null;
 
 function load(){
   try{ state=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }
   catch(e){ state={}; }
-  // Merge the copy committed to the repo. Whichever side was marked more
-  // recently wins, so syncing on the laptop carries over to the phone without
-  // either device clobbering a newer decision made on the other.
+  // Merge the copy committed to the repo, so a mark made on the laptop reaches
+  // the phone. Whichever side is more recent wins.
   var seed={};
   try{ seed=JSON.parse(document.body.getAttribute('data-seed')||'{}')||{}; }
   catch(e){ seed={}; }
   var merged=0;
   Object.keys(seed).forEach(function(u){
-    var s=seed[u], mine=state[u];
-    if(!s || !s.s) return;
-    if(!mine || (s.t||0) > (mine.t||0)){
-      state[u]={s:s.s, t:s.t||0, m:s.m||{}};
-      merged++;
+    var sd=seed[u], mine=state[u];
+    if(!sd || !sd.s) return;
+    if(!mine || (sd.t||0) > (mine.t||0)){
+      state[u]={s:sd.s,t:sd.t||0,m:sd.m||{}}; merged++;
     }
   });
-  if(merged){ save(); }
+  if(merged) save();
 }
 function save(){
   try{ localStorage.setItem(KEY,JSON.stringify(state)); }
   catch(e){ toast('Could not save - browser storage is blocked.'); }
 }
 function st(uid){ return (state[uid]||{}).s || ''; }
+function esc(t){ var d=document.createElement('div'); d.textContent=t==null?'':t; return d.innerHTML; }
+function $(s){ return document.querySelector(s); }
+function $$(s){ return [].slice.call(document.querySelectorAll(s)); }
 
-var cards=[].slice.call(document.querySelectorAll('.ev[data-uid]'));
-var groups=[].slice.call(document.querySelectorAll('.day[data-date]'));
+// Compact cards are the audit list of things that did NOT clear the bar.
+// They must never count as triageable events.
+var cards=$$('.ev[data-uid]:not([data-compact])');
+var groups=$$('.day[data-date]');
 var TODAY=document.body.getAttribute('data-today');
+var WSTART=document.body.getAttribute('data-wstart')||TODAY;
+var WEND=document.body.getAttribute('data-wend')||TODAY;
+
+function daysFrom(iso){
+  return Math.round((new Date(iso+'T00:00:00')-new Date(TODAY+'T00:00:00'))/864e5);
+}
 
 // ---------------------------------------------------------------- filtering
 function visible(c){
   var uid=c.getAttribute('data-uid'), s=st(uid);
   var date=c.getAttribute('data-date');
   var age=c.getAttribute('data-age'), changed=c.getAttribute('data-changed')==='1';
-  var future = date>=TODAY;
+  var future=date>=TODAY;
   if(mode==='going')  return s==='going';
   if(mode==='saved')  return s==='saved';
   if(mode==='hidden') return s==='hidden';
   if(mode==='new'){
     if(s==='hidden') return false;
-    var isNew = age!=='' && parseInt(age,10)<=2;
-    return future && (( !s && isNew ) || changed);
+    // "New" means new. Anything older than a day belongs in Up next, not here.
+    var isNew = age!=='' && age!==null && parseInt(age,10)<=NEW_MAX_AGE;
+    return future && ((!s && isNew) || changed);
   }
-  if(mode==='calendar'){
-    if(s==='hidden') return false;
-    return selDate ? date===selDate : false;
-  }
-  // upnext
+  // The calendar renders its own brief rows, so the full pool stays hidden.
+  if(mode==='calendar') return false;
   if(s) return false;
   if(!future) return false;
-  if(showAll) return true;
-  return daysFrom(date)<HORIZON;
-}
-function daysFrom(iso){
-  return Math.round((new Date(iso+'T00:00:00')-new Date(TODAY+'T00:00:00'))/864e5);
+  return showAll || daysFrom(date)<HORIZON;
 }
 
 function render(){
   var shown=0;
   cards.forEach(function(c){
     var v=visible(c);
-    c.hidden=!v;
+    if(c!==modalCard){ c.hidden=!v; }
     if(v) shown++;
     var s=st(c.getAttribute('data-uid'));
     c.classList.toggle('is-going',s==='going');
     c.classList.toggle('is-saved',s==='saved');
     c.classList.toggle('is-hidden',s==='hidden');
-    var btns=c.querySelectorAll('.tbtn');
-    for(var i=0;i<btns.length;i++){
-      btns[i].setAttribute('aria-pressed', String(btns[i].getAttribute('data-act')===s));
-    }
+    c.querySelectorAll('.tbtn[data-act]').forEach(function(b){
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-act')===s));
+    });
     var lbl=c.querySelector('.state');
     if(lbl) lbl.textContent = s==='going' ? 'Registered / attending'
                             : s==='saved' ? 'Saved'
                             : s==='hidden' ? 'Hidden from the main list' : '';
   });
-  groups.forEach(function(g){
-    var any=g.querySelector('.ev:not([hidden])');
-    g.hidden=!any;
-  });
-  document.getElementById('calpanel').hidden = (mode!=='calendar');
-  document.getElementById('horizonbar').hidden = (mode!=='upnext');
-  document.getElementById('goingbar').hidden = (mode!=='going');
+  groups.forEach(function(g){ g.hidden = !g.querySelector('.ev:not([hidden])'); });
+  $('#calpanel').hidden = (mode!=='calendar');
+  $('#horizonbar').hidden = (mode!=='upnext');
+  $('#goingbar').hidden = (mode!=='going');
   renderOrphans();
-  renderEmpty(shown);
   counts();
-  if(mode==='calendar') paintCalendar();
+  if(mode==='calendar'){ paintCalendar(); renderBrief(); }
+  else { $('#brief').innerHTML=''; $('#briefhead').hidden=true; }
+  renderEmpty(shown);
 }
 
 function renderEmpty(shown){
-  var e=document.getElementById('empty');
-  if(shown>0 && !(mode==='calendar'&&!selDate)){ e.hidden=true; return; }
-  var msg={
+  var e=$('#empty');
+  if(mode==='calendar'){ e.hidden=true; return; }
+  if(shown>0){ e.hidden=true; return; }
+  e.innerHTML={
     upnext:'<b>Nothing left to triage.</b> Every upcoming event has been marked. Check <em>Saved</em> for the ones you were undecided about.',
-    'new':'<b>Nothing new.</b> No listings posted in the last 3 days, and nothing you are tracking has changed. That is a normal result - Bay Area events post 1-3 weeks ahead.',
-    calendar: selDate ? '<b>Nothing on '+selDate+'.</b> Pick another date.' : 'Pick a date above to see that day&rsquo;s events.',
-    going:'<b>Nothing marked as going yet.</b> Use <em>I am going</em> on an event once you have registered, and it will move here.',
+    'new':'<b>Nothing new.</b> No listings appeared since yesterday, and nothing you are tracking has changed. That is the normal result on most days.',
+    going:'<b>Nothing marked as going yet.</b> Press <em>I am going</em> on an event once you have registered and it moves here.',
     saved:'<b>Nothing saved.</b> Use <em>Save for later</em> when you are undecided.',
     hidden:'<b>Nothing hidden.</b> Anything you mark <em>Not interested</em> lands here, so it is never lost.'
   }[mode]||'';
-  e.innerHTML=msg; e.hidden=!msg;
+  e.hidden=false;
 }
 
 function counts(){
-  var n={upnext:0,'new':0,going:0,saved:0,hidden:0};
-  var m=mode;
+  var keep=mode, n={};
   ['upnext','new','going','saved','hidden'].forEach(function(k){
     mode=k; n[k]=cards.filter(visible).length;
   });
-  mode=m;
+  mode=keep;
   Object.keys(n).forEach(function(k){
-    var el=document.querySelector('.tab[data-panel="'+k+'"] .cnt');
+    var el=$('.tab[data-panel="'+k+'"] .cnt');
     if(el){ el.textContent=n[k]; el.classList.toggle('zero',n[k]===0); }
   });
 }
 
 // ------------------------------------------------------- orphaned "going" items
-// An event marked "going" whose date has passed, or whose listing was pulled,
-// has no card in today's build. Showing the stored snapshot means a thing you
-// registered for never silently disappears.
 function renderOrphans(){
-  var box=document.getElementById('orphans');
-  box.innerHTML='';
+  var box=$('#orphans'); box.innerHTML='';
   if(mode!=='going') return;
   var live={}; cards.forEach(function(c){ live[c.getAttribute('data-uid')]=1; });
   Object.keys(state).forEach(function(uid){
     if(state[uid].s!=='going' || live[uid]) return;
-    var m=state[uid].m||{};
-    var past = m.d && m.d < TODAY;
+    var m=state[uid].m||{}, past=m.d && m.d<TODAY;
     var d=document.createElement('div');
     d.className='orphan';
-    d.innerHTML='<div class="t">'+esc(m.ti||'(untitled)')+'</div>'
-      +'<div class="m">'+esc(m.d||'?')+' '+esc(m.tm||'')+(m.v?' &middot; '+esc(m.v):'')
-      +' &mdash; '+(past?'already happened':'no longer in the current feed')+'</div>'
+    d.innerHTML='<div class="t">'+esc(m.ti||'(untitled)')+'</div><div class="m">'
+      +esc(m.d||'?')+' '+esc(m.tm||'')+(m.v?' &middot; '+esc(m.v):'')+' &mdash; '
+      +(past?'already happened':'no longer in the current feed')+'</div>'
       +(m.u?'<div class="m"><a href="'+esc(m.u)+'" target="_blank" rel="noopener">open listing</a></div>':'')
-      +'<div class="triage"><button class="tbtn" data-forget="'+esc(uid)+'">Remove from my list</button></div>';
+      +'<div class="triage"><button class="tbtn hide" data-forget="'+esc(uid)+'">Remove from my list</button></div>';
     box.appendChild(d);
   });
 }
-function esc(t){ var d=document.createElement('div'); d.textContent=t==null?'':t; return d.innerHTML; }
 
 // ---------------------------------------------------------------- calendar
-function paintCalendar(){
-  var byDate={};
+function monthCards(){
+  var by={};
   cards.forEach(function(c){
-    var uid=c.getAttribute('data-uid'), s=st(uid);
+    var s=st(c.getAttribute('data-uid'));
     if(s==='hidden') return;
     var d=c.getAttribute('data-date');
-    (byDate[d]=byDate[d]||{list:[],going:false});
-    if(s==='going'){ byDate[d].going=true; }
-    else if(!s){ byDate[d].list.push(c.getAttribute('data-verdict')); }
+    if(!by[d]) by[d]={list:[],going:false};
+    if(s==='going') by[d].going=true; else if(!s) by[d].list.push(c);
   });
-  [].slice.call(document.querySelectorAll('.cell[data-cell]')).forEach(function(cell){
-    var d=cell.getAttribute('data-cell'), info=byDate[d];
-    var dots=cell.querySelector('.dots');
-    dots.innerHTML='';
-    cell.classList.toggle('sel', d===selDate);
-    var mark=cell.querySelector('.going'); if(mark) mark.remove();
-    if(info && info.going){
-      var g=document.createElement('span'); g.className='going'; g.textContent='●';
-      cell.appendChild(g);
-    }
-    var n=info?info.list.length:0;
-    cell.classList.toggle('none', n===0 && !(info&&info.going));
-    (info?info.list:[]).slice(0,4).forEach(function(v){
-      var e=document.createElement('span');
-      e.className='dot '+(v==='GO'?'go':v==='WORTH IT'?'worth':v==='MAYBE'?'maybe':'');
-      dots.appendChild(e);
+  return by;
+}
+
+function buildGrid(){
+  var by=monthCards();
+  var first=new Date(calY,calM,1), start=(first.getDay()+6)%7;   // Monday-first
+  var ndays=new Date(calY,calM+1,0).getDate();
+  var html='<div class="grid">';
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(function(d){
+    html+='<div class="dow">'+d+'</div>';
+  });
+  for(var i=0;i<start;i++) html+='<div class="cday out"></div>';
+  for(var day=1; day<=ndays; day++){
+    var iso=calY+'-'+String(calM+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var info=by[iso], n=info?info.list.length:0, going=info&&info.going;
+    var cls='cday';
+    if(iso<WSTART||iso>WEND) cls+=' out';
+    else if(!n && !going) cls+=' none';
+    if(iso===TODAY) cls+=' today';
+    if(iso===selDate) cls+=' sel';
+    html+='<div class="'+cls+'" data-cell="'+iso+'"><span class="dnum">'+day+'</span>';
+    if(going) html+='<span class="going">&#9679;</span>';
+    html+='<span class="dots">';
+    if(info) info.list.slice(0,4).forEach(function(c){
+      var v=c.getAttribute('data-verdict');
+      html+='<span class="dot '+(v==='GO'?'go':v==='WORTH IT'?'worth':v==='MAYBE'?'maybe':'')+'"></span>';
     });
+    html+='</span></div>';
+  }
+  return html+'</div>';
+}
+
+function paintCalendar(){
+  $('#calgrid').innerHTML=buildGrid();
+  $('#calmonth').value=String(calM);
+  $('#calyear').value=String(calY);
+  var minD=new Date(WSTART+'T00:00:00'), maxD=new Date(WEND+'T00:00:00');
+  $('#calprev').disabled = (calY<minD.getFullYear()||
+      (calY===minD.getFullYear()&&calM<=minD.getMonth()));
+  $('#calnext').disabled = (calY>maxD.getFullYear()||
+      (calY===maxD.getFullYear()&&calM>=maxD.getMonth()));
+}
+
+function renderBrief(){
+  var head=$('#briefhead'), box=$('#brief');
+  box.innerHTML='';
+  if(!selDate){
+    head.hidden=false;
+    head.textContent='Pick a date above to see what is on.';
+    return;
+  }
+  var rows=cards.filter(function(c){
+    return c.getAttribute('data-date')===selDate && st(c.getAttribute('data-uid'))!=='hidden';
+  }).sort(function(a,b){
+    return (a.getAttribute('data-start')||'').localeCompare(b.getAttribute('data-start')||'');
   });
+  var d=new Date(selDate+'T00:00:00');
+  head.hidden=false;
+  head.textContent=d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})
+                   +' — '+rows.length+(rows.length===1?' event':' events');
+  if(!rows.length){
+    box.innerHTML='<div class="ghost">Nothing recommended on this date.</div>';
+    return;
+  }
+  rows.forEach(function(c){
+    var uid=c.getAttribute('data-uid'), s=st(uid);
+    var v=c.getAttribute('data-verdict'), sc=c.getAttribute('data-score');
+    var col=v==='GO'?'var(--good)':v==='WORTH IT'?'var(--accent)':
+            v==='MAYBE'?'var(--warn)':'var(--dim)';
+    var r=document.createElement('div');
+    r.className='brow';
+    r.innerHTML='<span class="bt">'+esc(c.getAttribute('data-time')||'TBD')+'</span>'
+      +'<span class="bn">'+esc(c.getAttribute('data-title'))+'</span>'
+      +(s==='going'?'<span class="bg">GOING</span>':s==='saved'?'<span class="bg" style="color:#0e7490">SAVED</span>':'')
+      +'<span class="bs" style="background:'+col+'">'+esc(sc)+'</span>'
+      +'<button class="bx" data-expand="'+esc(uid)+'" title="Expand" '
+      +'aria-label="Expand '+esc(c.getAttribute('data-title'))+'">&#10530;</button>';
+    box.appendChild(r);
+  });
+}
+
+// ---------------------------------------------------------------- expand modal
+function openModal(uid){
+  var card=cards.filter(function(c){ return c.getAttribute('data-uid')===uid; })[0];
+  if(!card) return;
+  // Move the real node rather than cloning it, so its triage buttons stay wired
+  // to the same state and there is never a second copy to keep in sync.
+  modalHome={parent:card.parentNode, next:card.nextSibling};
+  modalCard=card;
+  card.hidden=false;
+  $('#sheetbody').appendChild(card);
+  $('#modal').hidden=false;
+  document.body.classList.add('modal-open');
+  $('#modalclose').focus();
+}
+function closeModal(){
+  if(!modalCard) return;
+  modalHome.parent.insertBefore(modalCard, modalHome.next);
+  modalCard=null; modalHome=null;
+  $('#modal').hidden=true;
+  document.body.classList.remove('modal-open');
+  render();
 }
 
 // ---------------------------------------------------------------- .ics export
 function pad(n){ return (n<10?'0':'')+n; }
-function icsEscape(t){ return String(t||'').replace(/([,;\\])/g,'\\$1').replace(/\n/g,'\\n'); }
+function icsEsc(t){ return String(t||'').replace(/([,;\\])/g,'\\$1').replace(/\n/g,'\\n'); }
 function buildICS(){
   var out=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//job-event-search//EN',
-           'CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+           'CALSCALE:GREGORIAN','METHOD:PUBLISH'], n=0;
   var now=new Date();
   var stamp=now.getUTCFullYear()+pad(now.getUTCMonth()+1)+pad(now.getUTCDate())+'T'
            +pad(now.getUTCHours())+pad(now.getUTCMinutes())+pad(now.getUTCSeconds())+'Z';
-  var n=0;
   cards.forEach(function(c){
     var uid=c.getAttribute('data-uid');
     if(st(uid)!=='going') return;
-    var startRaw=c.getAttribute('data-start');
-    if(!startRaw) return;
+    var r=c.getAttribute('data-start');
+    if(!r) return;
     var dur=parseInt(c.getAttribute('data-dur')||'120',10);
-    // Floating local time: no VTIMEZONE needed and every calendar app reads it
-    // as the viewer's local time, which is correct for an in-person SF event.
-    var sd=new Date(startRaw.slice(0,4)+'-'+startRaw.slice(4,6)+'-'+startRaw.slice(6,8)
-                    +'T'+startRaw.slice(9,11)+':'+startRaw.slice(11,13)+':00');
+    // Floating local time: no VTIMEZONE needed, and every calendar app reads it as
+    // the viewer's local time, which is correct for an in-person SF event.
+    var sd=new Date(r.slice(0,4)+'-'+r.slice(4,6)+'-'+r.slice(6,8)+'T'
+                    +r.slice(9,11)+':'+r.slice(11,13)+':00');
     var ed=new Date(sd.getTime()+dur*60000);
-    function fmt(d){ return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'
-                     +pad(d.getHours())+pad(d.getMinutes())+'00'; }
-    out.push('BEGIN:VEVENT');
-    out.push('UID:'+uid+'@job-event-search');
-    out.push('DTSTAMP:'+stamp);
-    out.push('DTSTART:'+fmt(sd));
-    out.push('DTEND:'+fmt(ed));
-    out.push('SUMMARY:'+icsEscape(c.getAttribute('data-title')));
-    var v=c.getAttribute('data-venue'); if(v) out.push('LOCATION:'+icsEscape(v));
-    out.push('DESCRIPTION:'+icsEscape('Score '+c.getAttribute('data-score')+'/100. '
-             +c.getAttribute('data-url')));
-    out.push('URL:'+icsEscape(c.getAttribute('data-url')));
-    out.push('END:VEVENT');
+    function f(d){ return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'
+                   +pad(d.getHours())+pad(d.getMinutes())+'00'; }
+    out.push('BEGIN:VEVENT','UID:'+uid+'@job-event-search','DTSTAMP:'+stamp,
+             'DTSTART:'+f(sd),'DTEND:'+f(ed),
+             'SUMMARY:'+icsEsc(c.getAttribute('data-title')));
+    var v=c.getAttribute('data-venue'); if(v) out.push('LOCATION:'+icsEsc(v));
+    out.push('DESCRIPTION:'+icsEsc('Score '+c.getAttribute('data-score')+'/100. '
+             +c.getAttribute('data-url')),
+             'URL:'+icsEsc(c.getAttribute('data-url')),'END:VEVENT');
     n++;
   });
   out.push('END:VCALENDAR');
@@ -648,10 +753,8 @@ function download(name,text,type){
 // ---------------------------------------------------------------- toast + undo
 var toastEl;
 function toast(msg,undo){
-  if(!toastEl){
-    toastEl=document.createElement('div'); toastEl.className='toast';
-    document.body.appendChild(toastEl);
-  }
+  if(!toastEl){ toastEl=document.createElement('div'); toastEl.className='toast';
+                document.body.appendChild(toastEl); }
   toastEl.innerHTML='<span></span>';
   toastEl.firstChild.textContent=msg;
   if(undo){
@@ -675,85 +778,110 @@ function setTriage(card,act){
       tm:card.getAttribute('data-time'), v:card.getAttribute('data-venue'),
       u:card.getAttribute('data-url')}};
   }
-  save(); render();
-  var word={going:'Marked as going',saved:'Saved for later',hidden:'Hidden'}[act]
-            || 'Cleared';
-  toast(st(uid)?word:'Cleared', function(){
-    if(prev) state[uid]=prev; else delete state[uid];
-    save(); render();
+  save();
+  // A decision made inside the expanded view is a decision - step back out.
+  if(modalCard===card) closeModal(); else render();
+  toast(st(uid)?{going:'Marked as going',saved:'Saved for later',hidden:'Hidden'}[act]
+                :'Cleared',
+        function(){ if(prev) state[uid]=prev; else delete state[uid]; save(); render(); });
+}
+
+function selectTab(name){
+  mode=name;
+  $$('.tab').forEach(function(x){
+    x.setAttribute('aria-selected', String(x.getAttribute('data-panel')===name));
   });
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 document.addEventListener('click',function(e){
-  var t=e.target;
-  var tab=t.closest?t.closest('.tab'):null;
-  if(tab){
-    mode=tab.getAttribute('data-panel');
-    [].slice.call(document.querySelectorAll('.tab')).forEach(function(x){
-      x.setAttribute('aria-selected', String(x===tab));
-    });
-    render();
-    window.scrollTo({top:0,behavior:'smooth'});
-    return;
-  }
-  var btn=t.closest?t.closest('.tbtn[data-act]'):null;
-  if(btn){ setTriage(btn.closest('.ev'), btn.getAttribute('data-act')); return; }
-  var forget=t.closest?t.closest('[data-forget]'):null;
-  if(forget){
-    var u=forget.getAttribute('data-forget');
-    var prev=state[u]; delete state[u]; save(); render();
+  var t=e.target; if(!t.closest) return;
+  var el;
+  if((el=t.closest('.tab'))){ selectTab(el.getAttribute('data-panel')); return; }
+  if((el=t.closest('.tbtn[data-act]'))){ setTriage(el.closest('.ev'), el.getAttribute('data-act')); return; }
+  if((el=t.closest('[data-forget]'))){
+    var u=el.getAttribute('data-forget'), prev=state[u];
+    delete state[u]; save(); render();
     toast('Removed', function(){ state[u]=prev; save(); render(); });
     return;
   }
-  var cell=t.closest?t.closest('.cell[data-cell]'):null;
-  if(cell && !cell.classList.contains('out')){
-    var d=cell.getAttribute('data-cell');
-    selDate = (selDate===d)? null : d;
-    render();
+  if((el=t.closest('[data-expand]'))){ openModal(el.getAttribute('data-expand')); return; }
+  if(t.closest('#modalclose') || t.closest('#modal .backdrop')){ closeModal(); return; }
+  if((el=t.closest('.cday[data-cell]')) && !el.classList.contains('out')){
+    var d=el.getAttribute('data-cell');
+    selDate=(selDate===d)?null:d;
+    // Toggle the class in place rather than re-rendering the grid: rebuilding
+    // detached the very node that was clicked, so the second click hit an orphan
+    // and the day could never be deselected.
+    $$('.cday[data-cell]').forEach(function(x){
+      x.classList.toggle('sel', x.getAttribute('data-cell')===selDate);
+    });
+    renderBrief();
     return;
+  }
+  if(t.id==='calprev'||t.id==='calnext'){
+    calM += (t.id==='calnext'?1:-1);
+    if(calM<0){ calM=11; calY--; } if(calM>11){ calM=0; calY++; }
+    selDate=null; paintCalendar(); renderBrief(); return;
   }
   if(t.id==='horizon'){
     showAll=!showAll;
-    t.textContent = showAll ? 'Show only the next 2 weeks'
-                            : 'Show the whole window';
+    t.textContent = showAll?'Show only the next 2 weeks':'Show the whole window';
     render(); return;
   }
   if(t.id==='ics'){
     var ics=buildICS();
     if(!ics){ toast('Nothing marked as going yet.'); return; }
     download('job-events.ics',ics,'text/calendar');
-    toast('Downloaded - open it to add these to your calendar.');
-    return;
+    toast('Downloaded - open it to add these to your calendar.'); return;
   }
-  if(t.closest && t.closest('[data-sync]')){
-    var box=document.getElementById('syncbox');
-    box.hidden=!box.hidden;
+  if(t.closest('[data-sync]')){
+    var box=$('#syncbox'); box.hidden=!box.hidden;
     if(!box.hidden){
       var slim={};
       Object.keys(state).forEach(function(u){ slim[u]={s:state[u].s,t:state[u].t,m:state[u].m}; });
-      document.getElementById('syncjson').value=JSON.stringify(slim);
+      $('#syncjson').value=JSON.stringify(slim);
+      box.scrollIntoView({behavior:'smooth',block:'nearest'});
     }
     return;
   }
   if(t.id==='copysync'){
-    var ta=document.getElementById('syncjson');
-    ta.select();
-    navigator.clipboard.writeText(ta.value).then(
-      function(){ toast('Copied. Paste it into data/triage.json and commit.'); },
+    var ta=$('#syncjson'); ta.select();
+    (navigator.clipboard? navigator.clipboard.writeText(ta.value)
+     : Promise.reject()).then(
+      function(){ toast('Copied. Paste into data/triage.json and commit.'); },
       function(){ toast('Select the text and copy manually.'); });
     return;
   }
   if(t.id==='dlsync'){
-    download('triage.json',document.getElementById('syncjson').value,'application/json');
-    toast('Saved triage.json - move it into data/ and commit.');
-    return;
+    download('triage.json',$('#syncjson').value,'application/json');
+    toast('Saved triage.json - move it into data/ and commit.'); return;
   }
 });
 
+document.addEventListener('change',function(e){
+  if(e.target.id==='calmonth'||e.target.id==='calyear'){
+    calM=parseInt($('#calmonth').value,10);
+    calY=parseInt($('#calyear').value,10);
+    selDate=null; paintCalendar(); renderBrief();
+  }
+});
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape' && modalCard) closeModal();
+});
+
+// Open the calendar on the month containing today, or the window start.
+(function initCal(){
+  var d=new Date((TODAY>=WSTART?TODAY:WSTART)+'T00:00:00');
+  calY=d.getFullYear(); calM=d.getMonth();
+})();
 load();
 render();
 })();
 """
+
 
 
 def write_html(path, days, new_uids, meta, today, seed=None):
@@ -770,15 +898,21 @@ def write_html(path, days, new_uids, meta, today, seed=None):
            '<title>Job-Event Search &mdash; SF</title><style>%s</style></head>' % CSS,
            # data/triage.json travels through git, so marks made on the laptop
            # reach the phone. The client merges it into localStorage by recency.
-           '<body data-today="%s" data-seed="%s">'
-           % (_e(tkey), _e(json.dumps(seed or {}, separators=(",", ":")))),
+           '<body data-today="%s" data-wstart="%s" data-wend="%s" data-seed="%s">'
+           % (_e(tkey), _e(keys[0] if keys else tkey),
+              _e(keys[-1] if keys else tkey),
+              _e(json.dumps(seed or {}, separators=(",", ":")))),
            '<div class="wrap">']
     out.append("<h1>Where should I go to get hired?</h1>")
     out.append('<p class="sub">San Francisco &amp; Bay Area &nbsp;·&nbsp; window %s to %s '
                '&nbsp;·&nbsp; generated %s</p>'
                % (meta["window_start"], meta["window_end"],
                   dt.datetime.now().strftime("%Y-%m-%d %H:%M")))
-    out.append('<div class="stats">')
+    out.append('<div class="summary"><span class="pill">%s recommended</span>'
+               '<span>from %s listings scanned</span></div>'
+               % (_e(meta["recommended"]), _e(meta["raw_listings"])))
+    out.append('<details class="stats-d"><summary>How this run went</summary>'
+               '<div class="stats">')
     for label, val in [("raw listings collected", meta["raw_listings"]),
                        ("unique events after dedupe", meta["unique_events"]),
                        ("recommended", meta["recommended"]),
@@ -786,41 +920,68 @@ def write_html(path, days, new_uids, meta, today, seed=None):
                        ("HTTP requests", meta["http"]["fetched"]),
                        ("runtime", "%ss" % meta["runtime_s"])]:
         out.append('<div class="stat"><b>%s</b>%s</div>' % (_e(val), _e(label)))
-    out.append('</div>')
+    out.append('</div></details>')
 
     # ---------- tabs
-    tabs = [("upnext", "Up next", True), ("new", "New &amp; changed", False),
-            ("calendar", "Calendar", False), ("going", "Going", False),
-            ("saved", "Saved", False), ("hidden", "Hidden", False)]
-    out.append('<div class="tabs" role="tablist">')
-    for pid, label, sel in tabs:
+    # Two groups: what to look at, then what you have already decided about.
+    out.append('<div class="tabbar"><div class="tabs" role="tablist">')
+    for pid, label in [("upnext", "Up next"), ("new", "New"), ("calendar", "Calendar")]:
         cnt = "" if pid == "calendar" else '<span class="cnt">0</span>'
-        out.append('<button class="tab" role="tab" data-panel="%s" aria-selected="%s">'
-                   '%s%s</button>' % (pid, "true" if sel else "false", label, cnt))
-    out.append('</div>')
+        out.append('<button class="tab t-%s" role="tab" data-panel="%s" aria-selected="%s">'
+                   '<span class="dotc"></span>%s%s</button>'
+                   % (pid, pid, "true" if pid == "upnext" else "false", label, cnt))
+    out.append('<span class="tabsep"></span>')
+    for pid, label in [("going", "Going"), ("saved", "Saved"), ("hidden", "Hidden")]:
+        out.append('<button class="tab t-%s" role="tab" data-panel="%s" aria-selected="false">'
+                   '<span class="dotc"></span>%s<span class="cnt">0</span></button>'
+                   % (pid, pid, label))
+    out.append('</div></div>')
 
     # ---------- calendar (hidden unless the Calendar tab is active)
-    out.append('<div id="calpanel" hidden>')
-    out.append(_month_grids(keys, today))
+    months = ["January", "February", "March", "April", "May", "June", "July",
+              "August", "September", "October", "November", "December"]
+    y0 = int((keys[0] if keys else tkey)[:4])
+    y1 = int((keys[-1] if keys else tkey)[:4])
+    out.append('<div id="calpanel" hidden><div class="calnav">')
+    out.append('<button class="nav" id="calprev" aria-label="Previous month">&#8249;</button>')
+    out.append('<select id="calmonth" aria-label="Month">')
+    for i, name in enumerate(months):
+        out.append('<option value="%d">%s</option>' % (i, name))
+    out.append('</select><select id="calyear" aria-label="Year">')
+    for y in range(y0, y1 + 1):
+        out.append('<option value="%d">%d</option>' % (y, y))
+    out.append('</select>')
+    out.append('<button class="nav" id="calnext" aria-label="Next month">&#8250;</button>')
+    out.append('</div><div class="cal" id="calgrid"></div>')
+    out.append('<div class="callegend">'
+               '<span><i style="background:var(--good)"></i>GO</span>'
+               '<span><i style="background:var(--accent)"></i>worth it</span>'
+               '<span><i style="background:var(--warn)"></i>maybe</span>'
+               '<span><b style="color:var(--good)">&#9679;</b>&nbsp;you are going</span>'
+               '</div>')
+    out.append('<div class="briefhead" id="briefhead"></div><div class="brief" id="brief"></div>')
     out.append('</div>')
 
     # ---------- contextual toolbars
     out.append('<div class="bar" id="horizonbar">'
                '<button class="abtn" id="horizon">Show the whole window</button>'
-               '<button class="abtn" data-sync>Sync to the Telegram alerts</button>'
                '</div>')
     out.append('<div class="bar" id="goingbar" hidden>'
-               '<button class="abtn primary" id="ics">Add these to my calendar (.ics)</button>'
-               '<button class="abtn" data-sync>Sync to the Telegram alerts</button>'
+               '<button class="abtn dl" id="ics">&#8681;&nbsp; Add these to my calendar</button>'
+               '<span class="spacer"></span>'
+               '<button class="abtn quiet" data-sync>Sync marks to my other devices</button>'
                '</div>')
     out.append('<div class="sync" id="syncbox" hidden>'
-               '<p class="daynote">The dashboard keeps your choices in this browser only. '
-               'To let the daily Telegram alert know what you have registered for, copy '
-               'this into <code>data/triage.json</code> in the repo and commit it.</p>'
+               '<p class="daynote"><b>What this is for.</b> Your Going / Saved / Hidden '
+               'marks are stored in this browser only. Copying them into '
+               '<code>data/triage.json</code> does two things: your phone picks up what '
+               'you marked on your laptop, and the daily Telegram alert stops telling you '
+               'about events you already registered for &mdash; and starts reminding you '
+               'when to leave the house for them. Skip it if you only ever use one device '
+               'and do not use the alerts.</p>'
                '<textarea id="syncjson" readonly></textarea>'
-               '<div class="bar"><button class="abtn primary" id="copysync">Copy</button>'
+               '<div class="bar"><button class="abtn dl" id="copysync">Copy</button>'
                '<button class="abtn" id="dlsync">Download triage.json</button></div></div>')
-
     out.append('<div id="empty" class="ghost" hidden></div>')
     out.append('<div id="orphans"></div>')
 
@@ -870,6 +1031,11 @@ def write_html(path, days, new_uids, meta, today, seed=None):
                'They survive the daily rebuild because each event has a stable id, but '
                'they do not follow you to another device.</div>')
     out.append('</div>')
+    out.append('<div id="modal" hidden role="dialog" aria-modal="true" '
+               'aria-label="Event detail"><div class="backdrop"></div>'
+               '<div class="sheet"><button class="close" id="modalclose" '
+               'aria-label="Close">&times;</button>'
+               '<div id="sheetbody"></div></div></div>')
     out.append('<script>%s</script>' % JS)
     out.append('</body></html>')
 

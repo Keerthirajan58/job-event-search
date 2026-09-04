@@ -118,7 +118,7 @@ The page is a triage queue, not a wall of text. Six views:
 |---|---|
 | **Up next** | events you have not yet decided about, next 14 days (one button widens it to the whole window). This is the home view — anything you act on leaves it |
 | **New & changed** | listings first seen in the last 3 days, plus anything you are tracking whose time, venue or price moved. Where to look first each morning |
-| **Calendar** | month grid for the window. Tap a date to see only that day. Dots show how many events and how good; a green dot marks a day you are already going to something |
+| **Calendar** | one month at a time, with month/year pickers. Tap a date and you get a compact list — time, title, score — with an expand button that opens the full card over a blurred page. Dots show how many events and how good; a green dot marks a day you are already going to something |
 | **Going** | what you have registered for, with an **Add to my calendar (.ics)** button |
 | **Saved** | undecided, for later |
 | **Hidden** | dismissed. Nothing is ever deleted — it just stops cluttering Up next |
@@ -149,6 +149,20 @@ If an event you marked **Going** later drops out of the feed (the listing is pul
 or the date passes), the Going tab still shows it from a stored snapshot, flagged as
 *no longer in the current feed*. Something you registered for should never silently
 vanish.
+
+## Running the tests
+
+```bash
+npm install --no-save jsdom     # once, for the dashboard tests
+./tests/run_tests.sh
+```
+
+132 assertions: 32 in Python over `history`, `triage` and `notify`, and 100 in jsdom
+over the dashboard — every tab, every triage transition, undo, the calendar and its
+month navigation, the expand modal, `.ics` output, the sync payload, reload
+persistence and both directions of the cross-device merge. Both suites also run in
+CI on every push, because a JavaScript error in the embedded script would break the
+whole page silently.
 
 ## Deploying it (daily digest on your phone, $0)
 

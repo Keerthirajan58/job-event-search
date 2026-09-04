@@ -152,7 +152,8 @@ def build_message(digest_path="out/digest.json", con=None, today=None,
 
     # ---- 3. tomorrow's commitments, with a leave-by time
     tom = (today + dt.timedelta(days=1)).isoformat()
-    plans = [e for e in events if e["uid"] in going and e["date"] == tom]
+    plans = [e for e in events if e["uid"] in going and e["date"] == tom
+             and not _already(owned, e["uid"], "tomorrow:" + tom)]
     if plans:
         body = ["Tomorrow you are going to:", ""]
         for e in plans:
