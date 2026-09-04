@@ -73,8 +73,11 @@ jobs:
 
       - name: Dashboard tests
         run: |
-          npm install --no-save --no-audit --no-fund --silent jsdom
+          npm install --no-save --no-audit --no-fund --silent jsdom puppeteer-core
           node tests/dashboard.test.js
+          # Ubuntu runners ship Chrome; the browser suite skips itself if not.
+          CHROME_PATH=$(command -v google-chrome || command -v chromium-browser || true) \
+            node tests/browser.test.js
 
       # first_seen.json is the durable half of the state. Committing it is what
       # makes the "New" tab mean anything the day after a cache eviction.

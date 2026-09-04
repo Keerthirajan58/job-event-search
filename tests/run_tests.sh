@@ -49,5 +49,18 @@ PY
 fi
 
 echo
+echo "=================================================================="
+echo " Real browser:  what is actually painted and clickable"
+echo "=================================================================="
+# jsdom reports element.hidden, not the CSS cascade. A shipped bug where
+# #modal{display:flex} beat [hidden]{display:none} passed 100 jsdom assertions
+# and still covered the whole page, so this suite is not optional.
+if [ ! -f out/index.html ]; then
+  echo "  SKIP: out/index.html missing."
+else
+  node tests/browser.test.js 2>/dev/null || rc=1
+fi
+
+echo
 if [ $rc -eq 0 ]; then echo "ALL SUITES PASSED"; else echo "SOME SUITES FAILED"; fi
 exit $rc

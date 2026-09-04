@@ -157,12 +157,22 @@ npm install --no-save jsdom     # once, for the dashboard tests
 ./tests/run_tests.sh
 ```
 
-132 assertions: 32 in Python over `history`, `triage` and `notify`, and 100 in jsdom
-over the dashboard — every tab, every triage transition, undo, the calendar and its
-month navigation, the expand modal, `.ics` output, the sync payload, reload
-persistence and both directions of the cross-device merge. Both suites also run in
-CI on every push, because a JavaScript error in the embedded script would break the
-whole page silently.
+Three suites, ~235 assertions, all run in CI on every push:
+
+| suite | what it covers |
+|---|---|
+| `tests/test_*.py` (32) | `history`, `triage`, `notify` — first-seen persistence and pruning, malformed input, and every alert branch including the silence |
+| `tests/dashboard.test.js` (179, jsdom) | every tab, triage transition, undo, calendar navigation, the expand modal, `.ics` output, the sync payload, reload persistence, cross-device merge |
+| `tests/browser.test.js` (26, real Chrome) | what is actually **painted and clickable** |
+
+The third suite is not redundant, and the reason is worth stating. jsdom checks
+`element.hidden` — the DOM property. A shipped bug where `#modal{display:flex}`
+overrode the user-agent `[hidden]{display:none}` rule left an empty modal and a
+blurred backdrop covering the entire page: the property was `true`, all 100 jsdom
+assertions passed, and the site was unusable. Only a real cascade catches that, so
+the browser suite asserts what `elementFromPoint` returns and what
+`getComputedStyle` computes. There is now also a global `[hidden]{display:none
+!important}` guard so no future `display` rule can win that fight.
 
 ## Deploying it (daily digest on your phone, $0)
 

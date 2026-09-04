@@ -76,6 +76,40 @@ group('page structure');
   ok(new Set(ids).size === ids.length, 'no duplicate element ids');
 }
 
+/* ---------------------------------------- regression: hidden must really hide
+ * The HTML `hidden` attribute is honoured only by the user-agent rule
+ * [hidden]{display:none}, which loses to ANY author rule of equal specificity.
+ * `#modal{display:flex}` therefore shipped a permanently-open empty modal over
+ * the entire page. Asserting element.hidden is NOT enough - it was true the whole
+ * time. Assert what the cascade actually computes. */
+group('regression: [hidden] must actually hide');
+{
+  const p = open_();
+  const all = p.$$('[hidden]');
+  ok(all.length > 0, 'the page hides things by attribute', all.length);
+  all.forEach(el => {
+    const disp = p.w.getComputedStyle(el).display;
+    ok(disp === 'none', 'hidden element is not rendered: ' + (el.id || el.className),
+       'display:' + disp);
+  });
+  ok(/\[hidden\]\{display:none!important\}/.test(p.$('style').textContent),
+     'a global [hidden] guard rule exists so this cannot regress');
+}
+{
+  // Same guarantee for elements the script hides at runtime.
+  const p = open_();
+  p.go('calendar');
+  ok(p.w.getComputedStyle(p.$('#horizonbar')).display === 'none',
+     'a toolbar hidden by script is really gone');
+  ok(p.w.getComputedStyle(p.$('#goingbar')).display === 'none',
+     'the going toolbar is really gone');
+  p.go('going');
+  ok(p.w.getComputedStyle(p.$('#goingbar')).display !== 'none',
+     'and comes back when it should');
+  ok(p.w.getComputedStyle(p.$('#calpanel')).display === 'none',
+     'the calendar is really gone when another tab is active');
+}
+
 /* -------------------------------------------------- regression: .cell clash */
 group('regression: cost strip must not inherit calendar sizing');
 {

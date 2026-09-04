@@ -11,6 +11,15 @@ from .report import CAT_COLOR, CONF_COLOR, pick
 from .score import CATEGORIES
 
 CSS = """
+/* MUST come first and MUST stay !important.
+   The HTML `hidden` attribute is only honoured by the user-agent rule
+   [hidden]{display:none}, which loses to ANY author rule of equal specificity -
+   so `.bar{display:flex}` and `#modal{display:flex}` silently re-showed elements
+   the script had hidden. That shipped a permanently-open empty modal over the
+   whole page. Author-level !important is the only thing that cannot be
+   out-specified by a later display rule. */
+[hidden]{display:none!important}
+
 :root{--bg:#fbfbfa;--card:#fff;--ink:#1a1d21;--dim:#6b7280;--line:#e5e7eb;
 --accent:#1462b5;--good:#0f7b3f;--warn:#8a5a00;--bad:#a13b2f}
 @media (prefers-color-scheme:dark){:root{--bg:#14161a;--card:#1c1f24;--ink:#e8eaed;
@@ -110,8 +119,8 @@ list-style:none;display:inline-flex;align-items:center;gap:6px;
 border:1px solid var(--line);border-radius:20px;padding:4px 12px;background:var(--card)}
 details.stats-d>summary::-webkit-details-marker{display:none}
 details.stats-d>summary:hover{border-color:var(--accent);color:var(--ink)}
-details.stats-d>summary::after{content:"\25be";font-size:10px}
-details.stats-d[open]>summary::after{content:"\25b4"}
+details.stats-d>summary::after{content:"▾";font-size:10px}
+details.stats-d[open]>summary::after{content:"▴"}
 details.stats-d .stats{margin-top:12px}
 
 /* ---------------------------------------------------- tabs */
@@ -183,10 +192,10 @@ justify-content:center}
 .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .dow{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
 color:var(--dim);text-align:center;padding:4px 0;font-weight:700}
-.cday{aspect-ratio:1/1;border:1px solid var(--line);border-radius:9px;
+.cday{height:60px;border:1px solid var(--line);border-radius:9px;
 background:var(--card);padding:6px 4px 4px;display:flex;flex-direction:column;
 align-items:center;justify-content:flex-start;cursor:pointer;position:relative;
-font-size:13px;min-height:44px;transition:border-color .12s,background .12s}
+font-size:13px;transition:border-color .12s,background .12s}
 .cday.out{opacity:.25;cursor:default;background:transparent;border-color:transparent}
 .cday.none{cursor:default;color:var(--dim)}
 .cday:not(.out):not(.none):hover{border-color:var(--accent);

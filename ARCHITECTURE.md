@@ -446,6 +446,42 @@ selection and annotation, `.ics` generation, the sync payload, reload persistenc
 both directions of the recency merge. A JS syntax error would silently break the entire
 page, so `node --check` runs over the extracted script as well.
 
+## 5e. Phase 8b — what the tests missed, and why
+
+Four reported bugs, three found while writing tests for them, and one shipped
+regression that broke the site outright. The last one is the instructive one.
+
+**The page-breaking bug.** `#modal{display:flex}` was authored to centre the expanded
+card. The HTML `hidden` attribute is honoured only by the user-agent rule
+`[hidden]{display:none}`, and a user-agent rule loses to any author rule of equal
+specificity — so the modal was painted on every load: an empty sheet over a blurred,
+unclickable page. The dashboard suite asserted `element.hidden`, which was `true` the
+entire time. 100 assertions passed against a completely broken page.
+
+Two fixes, one structural and one procedural:
+
+- `[hidden]{display:none!important}` as the first rule in the stylesheet, so no later
+  `display` declaration can win that fight again.
+- A third test suite that drives real Chrome and asserts what is *painted* and what is
+  *clickable* — `elementFromPoint` at the centre of the viewport, `getComputedStyle`
+  on everything marked hidden, and a real click through the calendar and modal. The
+  jsdom suite also now checks computed display rather than the property.
+
+The general lesson: a test that asserts the same abstraction the code uses cannot
+catch a bug in that abstraction. `element.hidden` and "the user can see it" are not
+the same claim, and only the second one matters.
+
+**The other bugs this phase**
+
+| bug | cause | caught by |
+|---|---|---|
+| New tab listed all 97 events | `first_seen` lived only in a gitignored DB restored from `actions/cache`; on a miss everything read as new | the user; now guarded by a CI check that fails if all listings read as first-seen-today |
+| cost boxes were huge squares | the calendar CSS used `.cell`, which the cost strip already owned, so every box inherited `aspect-ratio:1/1` | reading the CSS after the user described the symptom |
+| borderline rejected cards were triageable | compact audit cards carry `data-uid`, so they joined the pool, the badges and the calendar | the new dashboard suite |
+| a calendar day could not be deselected | selecting rebuilt the grid and detached the clicked node | the new dashboard suite |
+| the tomorrow reminder repeated | it recorded that it had fired but never checked | the new notify suite |
+| "How this run went be" | `\25be` in a non-raw Python string ate `\25` as an octal escape | the first real screenshot |
+
 ## 6. Failure modes
 
 | Failure | Likelihood | Blast radius | Mitigation in place |
